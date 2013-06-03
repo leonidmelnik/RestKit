@@ -9,7 +9,7 @@
 #import <objc/message.h>
 
 // TODO: Factor out Core Data...
-#import "../CoreData/CoreData.h"
+#import "../CoreData/RKCoreData.h"
 
 #import "RKObjectMapper.h"
 #import "NSDictionary+RKAdditions.h"
