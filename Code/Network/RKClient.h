@@ -205,6 +205,7 @@ NSString* RKMakePathWithObject(NSString* path, id object);
  * string and then appended to the resourcePath as the query string of the request.
  */
 - (RKRequest*)get:(NSString*)resourcePath queryParams:(NSDictionary*)queryParams delegate:(NSObject<RKRequestDelegate>*)delegate;
+- (RKRequest*)get:(NSString*)resourcePath queryParams:(NSDictionary*)queryParams  successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail;
 
 /**
  * Create a resource via an HTTP POST with a set of form parameters

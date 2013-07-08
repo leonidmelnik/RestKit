@@ -34,6 +34,9 @@
 		_connection = nil;
 		_isLoading = NO;
 		_isLoaded = NO;
+		
+		NSArray* cookies = [[NSHTTPCookieStorage sharedHTTPCookieStorage] cookiesForURL:_URL];
+		[_URLRequest setAllHTTPHeaderFields:[NSHTTPCookie requestHeaderFieldsWithCookies:cookies]];
 	}
 	return self;
 }
