@@ -98,4 +98,9 @@
 	return [NSArray arrayWithArray:result];
 }
 
+- (void)mapFromDictionary:(NSDictionary*)dic
+{
+	[[[RKObjectManager sharedManager] mapper] mapObject:self fromDictionary:dic];
+}
+
 @end

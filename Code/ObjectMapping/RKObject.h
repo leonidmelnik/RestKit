@@ -22,4 +22,6 @@
 + (id)objectFromDictionary:(NSDictionary*)dic;
 + (NSArray*)arrayOfObjectsFromDictionaries:(NSArray*)dictionaries;
 
+- (void)mapFromDictionary:(NSDictionary*)dic;
+
 @end
