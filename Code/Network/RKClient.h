@@ -193,6 +193,9 @@ NSString* RKMakePathWithObject(NSString* path, id object);
  * object directly.
  */
 
+
+- (RKRequest*)load:(NSString*)resourcePath method:(RKRequestMethod)method params:(NSObject<RKRequestSerializable>*)params delegate:(id)delegate;
+
 /**
  * Fetch a resource via an HTTP GET
  */
