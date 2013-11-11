@@ -463,6 +463,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 		// TODO: I changed this to local time and it fixes my date issues. wtf?
 		[formatter setTimeZone:[NSTimeZone timeZoneForSecondsFromGMT:0]];
 		for (NSString* formatString in self.dateFormats) {
+			[formatter setTimeZone:[NSTimeZone localTimeZone]];
 			[formatter setDateFormat:formatString];
 			date = [formatter dateFromString:string];
 			if (date) {
