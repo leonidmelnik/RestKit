@@ -79,7 +79,8 @@
 		currentClass = [currentClass superclass];
 	}
 	
-	[_cachedPropertyNamesAndTypes setObject:propertyNames forKey:(id<NSCopying>)class];	
+	if(propertyNames && class)
+		[_cachedPropertyNamesAndTypes setObject:propertyNames forKey:(id<NSCopying>)class];
 	return propertyNames;
 }
 
