@@ -24,4 +24,6 @@
 
 - (void)mapFromDictionary:(NSDictionary*)dic;
 
+- (void)copyPropertiesFromObject:(RKObject*)object;
+
 @end

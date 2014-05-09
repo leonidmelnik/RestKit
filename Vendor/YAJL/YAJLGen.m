@@ -40,12 +40,12 @@ NSString *const YAJLGenInvalidObjectException = @"YAJLGenInvalidObjectException"
 
 - (id)initWithGenOptions:(YAJLGenOptions)genOptions indentString:(NSString *)indentString {
   if ((self = [super init])) {
-    genOptions_ = genOptions;
-    yajl_gen_config cfg = { 
-      ((genOptions & YAJLGenOptionsBeautify) ? 1 : 0),
-      [indentString UTF8String]
-    };    
-    gen_ = yajl_gen_alloc(&cfg, NULL);    
+	genOptions_ = genOptions;
+	yajl_gen_config cfg = { 
+	  ((genOptions & YAJLGenOptionsBeautify) ? 1 : 0),
+	  [indentString UTF8String]
+	};	
+	gen_ = yajl_gen_alloc(&cfg, NULL);	
   }
   return self;
 }
@@ -57,55 +57,55 @@ NSString *const YAJLGenInvalidObjectException = @"YAJLGenInvalidObjectException"
 
 - (void)object:(id)obj {  
   if ([obj respondsToSelector:@selector(JSON)]) {
-    return [self object:[obj JSON]];
+	return [self object:[obj JSON]];
   } else if ([obj isKindOfClass:[NSArray class]]) {
-    [self startArray];
-    for(id element in obj)
-      [self object:element];
-    [self endArray];
+	[self startArray];
+	for(id element in obj)
+	  [self object:element];
+	[self endArray];
   } else if ([obj isKindOfClass:[NSDictionary class]]) {
-    [self startDictionary];
-    for(id key in obj) {
-      [self object:key];
-      [self object:[obj objectForKey:key]];
-    }
-    [self endDictionary];
+	[self startDictionary];
+	for(id key in obj) {
+	  [self object:key];
+	  [self object:[obj objectForKey:key]];
+	}
+	[self endDictionary];
   } else if ([obj isKindOfClass:[NSNumber class]]) {
-    if ('c' != *[obj objCType]) {
-      [self number:obj];
-    } else {
-      [self bool:[obj boolValue]];
-    }
+	if ('c' != *[obj objCType]) {
+	  [self number:obj];
+	} else {
+	  [self bool:[obj boolValue]];
+	}
   } else if ([obj isKindOfClass:[NSString class]]) {
-    [self string:obj];
+	[self string:obj];
   } else if ([obj isKindOfClass:[NSNull class]]) {
-    [self null];
-  } else {    
-    
-    BOOL unknownType = NO;
-    if (genOptions_ & YAJLGenOptionsIncludeUnsupportedTypes) {
-      // Begin with support for non-JSON representable (PList) types
-      if ([obj isKindOfClass:[NSDate class]]) { 
-        [self number:[NSNumber numberWithLongLong:round([obj timeIntervalSince1970] * 1000)]];
-      } else if ([obj isKindOfClass:[NSData class]]) {
-        [self string:[YAJL_GTMBase64 stringByEncodingData:obj]];
-      } else if ([obj isKindOfClass:[NSURL class]]) {
-        [self string:[obj absoluteString]];
-      } else {
-        unknownType = YES;
-      }
-    } else {
-      unknownType = YES;
-    }
-    
-    // If we didn't handle special PList types
-    if (unknownType) {
-      if (!(genOptions_ & YAJLGenOptionsIgnoreUnknownTypes)) {
-        [NSException raise:YAJLGenInvalidObjectException format:@"Unknown object type: %@ (%@)", [obj class], obj];
-      } else {
-        [self null]; // Use null value for unknown type if we are ignoring
-      }
-    }
+	[self null];
+  } else {	
+	
+	BOOL unknownType = NO;
+	if (genOptions_ & YAJLGenOptionsIncludeUnsupportedTypes) {
+	  // Begin with support for non-JSON representable (PList) types
+	  if ([obj isKindOfClass:[NSDate class]]) { 
+		[self number:[NSNumber numberWithLongLong:round([obj timeIntervalSince1970] * 1000)]];
+	  } else if ([obj isKindOfClass:[NSData class]]) {
+		[self string:[YAJL_GTMBase64 stringByEncodingData:obj]];
+	  } else if ([obj isKindOfClass:[NSURL class]]) {
+		[self string:[obj absoluteString]];
+	  } else {
+		unknownType = YES;
+	  }
+	} else {
+	  unknownType = YES;
+	}
+	
+	// If we didn't handle special PList types
+	if (unknownType) {
+	  if (!(genOptions_ & YAJLGenOptionsIgnoreUnknownTypes)) {
+		[NSException raise:YAJLGenInvalidObjectException format:@"Unknown object type: %@ (%@)", [obj class], obj];
+	  } else {
+		[self null]; // Use null value for unknown type if we are ignoring
+	  }
+	}
   }
 }
 

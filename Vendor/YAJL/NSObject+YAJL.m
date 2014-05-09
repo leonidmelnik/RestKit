@@ -63,11 +63,11 @@
 - (id)yajl_JSONWithOptions:(YAJLParserOptions)options error:(NSError **)error {
   NSData *data = nil; 
   if ([self isKindOfClass:[NSData class]]) {
-    data = (NSData *)self;
+	data = (NSData *)self;
   } else if ([self respondsToSelector:@selector(dataUsingEncoding:)]) {
-    data = [(id)self dataUsingEncoding:NSUTF8StringEncoding];
+	data = [(id)self dataUsingEncoding:NSUTF8StringEncoding];
   } else {
-    [NSException raise:YAJLParsingUnsupportedException format:@"Object of type (%@) must implement dataUsingEncoding: to be parsed", [self class]];
+	[NSException raise:YAJLParsingUnsupportedException format:@"Object of type (%@) must implement dataUsingEncoding: to be parsed", [self class]];
   }
   
   YAJLDocument *document = [[YAJLDocument alloc] initWithData:data parserOptions:options error:error];

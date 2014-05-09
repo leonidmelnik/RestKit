@@ -39,8 +39,8 @@ extern NSString* const kRKStringBoundary;
 			[body appendData:[[NSString stringWithFormat:@"%@", value] dataUsingEncoding:NSUTF8StringEncoding]];
 		}
 		
-		_bodyStream    = [[NSInputStream inputStreamWithData:body] retain];
-		_bodyLength    = [body length];
+		_bodyStream	= [[NSInputStream inputStreamWithData:body] retain];
+		_bodyLength	= [body length];
 	}
 	
 	return self;
@@ -48,8 +48,8 @@ extern NSString* const kRKStringBoundary;
 
 - (id)initWithName:(NSString*)name data:(NSData*)data {
 	if ((self = [self initWithName:name])) {		
-		_bodyStream    = [[NSInputStream inputStreamWithData:data] retain];
-		_bodyLength    = [data length];
+		_bodyStream	= [[NSInputStream inputStreamWithData:data] retain];
+		_bodyLength	= [data length];
 	}
 	
 	return self;
@@ -60,10 +60,10 @@ extern NSString* const kRKStringBoundary;
 		NSAssert1([[NSFileManager defaultManager] fileExistsAtPath:filePath], @"Expected file to exist at path: %@", filePath);
 		_fileName = [[filePath lastPathComponent] retain];
 		_MIMEType = [[self mimeTypeForExtension:[filePath pathExtension]] retain];
-		_bodyStream    = [[NSInputStream inputStreamWithFileAtPath:filePath] retain];
+		_bodyStream	= [[NSInputStream inputStreamWithFileAtPath:filePath] retain];
 		
 		NSError* error = nil;		
-		_bodyLength    = [[[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&error] objectForKey:NSFileSize] unsignedIntegerValue];		
+		_bodyLength	= [[[[NSFileManager defaultManager] attributesOfItemAtPath:filePath error:&error] objectForKey:NSFileSize] unsignedIntegerValue];		
 		if (error) {
 			NSLog(@"Encountered an error while determining file size: %@", error);
 		}
@@ -79,11 +79,11 @@ extern NSString* const kRKStringBoundary;
 	[_MIMEHeader release];
 	_MIMEHeader = nil;
 	
-    [_bodyStream close];
+	[_bodyStream close];
 	[_bodyStream release];
 	_bodyStream = nil;
 	
-    [super dealloc];
+	[super dealloc];
 }
 
 - (NSString*)MIMEBoundary {
@@ -104,7 +104,7 @@ extern NSString* const kRKStringBoundary;
 		}
 	}
 	
-    return @"application/octet-stream";
+	return @"application/octet-stream";
 }
 
 #pragma mark NSStream methods
@@ -133,23 +133,23 @@ extern NSString* const kRKStringBoundary;
 	_length = _MIMEHeaderLength + _bodyLength + 2; // \r\n is the + 2
 	
 	// Open the stream
-    [_bodyStream open];
+	[_bodyStream open];
 }
 
 - (NSUInteger)length {
-    return _length;
+	return _length;
 }
 
 - (NSUInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)maxLength {
-    NSUInteger sent = 0, read;
+	NSUInteger sent = 0, read;
 	
 	// We are done with the read
-    if (_delivered >= _length) {
-        return 0;
-    }
+	if (_delivered >= _length) {
+		return 0;
+	}
 	
 	// First we send back the MIME headers
-    if (_delivered < _MIMEHeaderLength && sent < maxLength) {
+	if (_delivered < _MIMEHeaderLength && sent < maxLength) {
 		NSUInteger headerBytesRemaining, bytesRemainingInBuffer;
 		
 		headerBytesRemaining = _MIMEHeaderLength - _delivered;
@@ -158,39 +158,39 @@ extern NSString* const kRKStringBoundary;
 		bytesRemainingInBuffer = maxLength;
 		
 		// Send the entire header if there is room
-        read       = (headerBytesRemaining < bytesRemainingInBuffer) ? headerBytesRemaining : bytesRemainingInBuffer;
-        // sent allways 0
+		read	   = (headerBytesRemaining < bytesRemainingInBuffer) ? headerBytesRemaining : bytesRemainingInBuffer;
+		// sent allways 0
 		//[_MIMEHeader getBytes:buffer + sent range:NSMakeRange(_delivered, read)];
 		[_MIMEHeader getBytes:buffer range:NSMakeRange(_delivered, read)];
 		
-        sent += read;
-        _delivered += sent;
-    }
+		sent += read;
+		_delivered += sent;
+	}
 	
 	// Read the attachment body out of our underlying stream
-    while (_delivered >= _MIMEHeaderLength && _delivered < (_length - 2) && sent < maxLength) {
-        if ((read = [_bodyStream read:(buffer + sent) maxLength:(maxLength - sent)]) == 0) {
-            break;
-        }
+	while (_delivered >= _MIMEHeaderLength && _delivered < (_length - 2) && sent < maxLength) {
+		if ((read = [_bodyStream read:(buffer + sent) maxLength:(maxLength - sent)]) == 0) {
+			break;
+		}
 		
-        sent += read;
-        _delivered += read;
-    }
+		sent += read;
+		_delivered += read;
+	}
 	
 	// Append the \r\n 
-    if (_delivered >= (_length - 2) && sent < maxLength) {
-        if (_delivered == (_length - 2)) {
-            *(buffer + sent) = '\r';
-            sent ++;
+	if (_delivered >= (_length - 2) && sent < maxLength) {
+		if (_delivered == (_length - 2)) {
+			*(buffer + sent) = '\r';
+			sent ++;
 			_delivered ++;
-        }
+		}
 		
-        *(buffer + sent) = '\n';
-        sent ++;
+		*(buffer + sent) = '\n';
+		sent ++;
 		_delivered ++;
-    }
+	}
 	
-    return sent;
+	return sent;
 }
 
 @end

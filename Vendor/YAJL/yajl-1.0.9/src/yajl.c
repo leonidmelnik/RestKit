@@ -6,16 +6,16 @@
  * met:
  * 
  *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
+ *	 notice, this list of conditions and the following disclaimer.
  * 
  *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
+ *	 notice, this list of conditions and the following disclaimer in
+ *	 the documentation and/or other materials provided with the
+ *	 distribution.
  * 
  *  3. Neither the name of Lloyd Hilaiel nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
+ *	 contributors may be used to endorse or promote products derived
+ *	 from this software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -42,118 +42,118 @@
 const char *
 yajl_status_to_string(yajl_status stat)
 {
-    const char * statStr = "unknown";
-    switch (stat) {
-        case yajl_status_ok:
-            statStr = "ok, no error";
-            break;
-        case yajl_status_client_canceled:
-            statStr = "client canceled parse";
-            break;
-        case yajl_status_insufficient_data:
-            statStr = "eof was met before the parse could complete";
-            break;
-        case yajl_status_error:
-            statStr = "parse error";
-            break;
-    }
-    return statStr;
+	const char * statStr = "unknown";
+	switch (stat) {
+		case yajl_status_ok:
+			statStr = "ok, no error";
+			break;
+		case yajl_status_client_canceled:
+			statStr = "client canceled parse";
+			break;
+		case yajl_status_insufficient_data:
+			statStr = "eof was met before the parse could complete";
+			break;
+		case yajl_status_error:
+			statStr = "parse error";
+			break;
+	}
+	return statStr;
 }
 
 yajl_handle
 yajl_alloc(const yajl_callbacks * callbacks,
-           const yajl_parser_config * config,
-           const yajl_alloc_funcs * afs,
-           void * ctx)
+		   const yajl_parser_config * config,
+		   const yajl_alloc_funcs * afs,
+		   void * ctx)
 {
-    unsigned int allowComments = 0;
-    unsigned int validateUTF8 = 0;
-    yajl_handle hand = NULL;
-    yajl_alloc_funcs afsBuffer;
-    
-    /* first order of business is to set up memory allocation routines */
-    if (afs != NULL) {
-        if (afs->malloc == NULL || afs->realloc == NULL || afs->free == NULL)
-        {
-            return NULL;
-        }
-    } else {
-        yajl_set_default_alloc_funcs(&afsBuffer);
-        afs = &afsBuffer;
-    }
+	unsigned int allowComments = 0;
+	unsigned int validateUTF8 = 0;
+	yajl_handle hand = NULL;
+	yajl_alloc_funcs afsBuffer;
+	
+	/* first order of business is to set up memory allocation routines */
+	if (afs != NULL) {
+		if (afs->malloc == NULL || afs->realloc == NULL || afs->free == NULL)
+		{
+			return NULL;
+		}
+	} else {
+		yajl_set_default_alloc_funcs(&afsBuffer);
+		afs = &afsBuffer;
+	}
 
-    hand = (yajl_handle) YA_MALLOC(afs, sizeof(struct yajl_handle_t));
+	hand = (yajl_handle) YA_MALLOC(afs, sizeof(struct yajl_handle_t));
 
-    /* copy in pointers to allocation routines */
-    memcpy((void *) &(hand->alloc), (void *) afs, sizeof(yajl_alloc_funcs));
+	/* copy in pointers to allocation routines */
+	memcpy((void *) &(hand->alloc), (void *) afs, sizeof(yajl_alloc_funcs));
 
-    if (config != NULL) {
-        allowComments = config->allowComments;
-        validateUTF8 = config->checkUTF8;
-    }
+	if (config != NULL) {
+		allowComments = config->allowComments;
+		validateUTF8 = config->checkUTF8;
+	}
 
-    hand->callbacks = callbacks;
-    hand->ctx = ctx;
-    hand->lexer = yajl_lex_alloc(&(hand->alloc), allowComments, validateUTF8);
-    hand->bytesConsumed = 0;
-    hand->decodeBuf = yajl_buf_alloc(&(hand->alloc));
-    yajl_bs_init(hand->stateStack, &(hand->alloc));
+	hand->callbacks = callbacks;
+	hand->ctx = ctx;
+	hand->lexer = yajl_lex_alloc(&(hand->alloc), allowComments, validateUTF8);
+	hand->bytesConsumed = 0;
+	hand->decodeBuf = yajl_buf_alloc(&(hand->alloc));
+	yajl_bs_init(hand->stateStack, &(hand->alloc));
 
-    yajl_bs_push(hand->stateStack, yajl_state_start);    
+	yajl_bs_push(hand->stateStack, yajl_state_start);	
 
-    return hand;
+	return hand;
 }
 
 void
 yajl_free(yajl_handle handle)
 {
-    yajl_bs_free(handle->stateStack);
-    yajl_buf_free(handle->decodeBuf);
-    yajl_lex_free(handle->lexer);
-    YA_FREE(&(handle->alloc), handle);
+	yajl_bs_free(handle->stateStack);
+	yajl_buf_free(handle->decodeBuf);
+	yajl_lex_free(handle->lexer);
+	YA_FREE(&(handle->alloc), handle);
 }
 
 yajl_status
 yajl_parse(yajl_handle hand, const unsigned char * jsonText,
-           unsigned int jsonTextLen)
+		   unsigned int jsonTextLen)
 {
-    yajl_status status;
-    status = yajl_do_parse(hand, jsonText, jsonTextLen);
-    return status;
+	yajl_status status;
+	status = yajl_do_parse(hand, jsonText, jsonTextLen);
+	return status;
 }
 
 yajl_status
 yajl_parse_complete(yajl_handle hand)
 {
-    /* The particular case we want to handle is a trailing number.
-     * Further input consisting of digits could cause our interpretation
-     * of the number to change (buffered "1" but "2" comes in).
-     * A very simple approach to this is to inject whitespace to terminate
-     * any number in the lex buffer.
-     */
-    return yajl_parse(hand, (const unsigned char *)" ", 1);
+	/* The particular case we want to handle is a trailing number.
+	 * Further input consisting of digits could cause our interpretation
+	 * of the number to change (buffered "1" but "2" comes in).
+	 * A very simple approach to this is to inject whitespace to terminate
+	 * any number in the lex buffer.
+	 */
+	return yajl_parse(hand, (const unsigned char *)" ", 1);
 }
 
 unsigned char *
 yajl_get_error(yajl_handle hand, int verbose,
-               const unsigned char * jsonText, unsigned int jsonTextLen)
+			   const unsigned char * jsonText, unsigned int jsonTextLen)
 {
-    return yajl_render_error_string(hand, jsonText, jsonTextLen, verbose);
+	return yajl_render_error_string(hand, jsonText, jsonTextLen, verbose);
 }
 
 unsigned int
 yajl_get_bytes_consumed(yajl_handle hand)
 {
-    if (!hand) return 0;
-    else return hand->bytesConsumed;
+	if (!hand) return 0;
+	else return hand->bytesConsumed;
 }
 
 
 void
 yajl_free_error(yajl_handle hand, unsigned char * str)
 {
-    /* use memory allocation functions if set */
-    YA_FREE(&(hand->alloc), str);
+	/* use memory allocation functions if set */
+	YA_FREE(&(hand->alloc), str);
 }
 
 /* XXX: add utility routines to parse from file */

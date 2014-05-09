@@ -29,8 +29,7 @@
 	if (self = [self init]) {
 		self.logRequest = YES;
 		_URL = [URL retain];
-		_URLRequest = [[NSMutableURLRequest alloc] initWithURL:_URL];
-		[_URLRequest setTimeoutInterval:30.0];
+		_URLRequest = [[NSMutableURLRequest alloc] initWithURL:_URL cachePolicy:NSURLRequestReloadIgnoringCacheData timeoutInterval:30.0];
 		_connection = nil;
 		_isLoading = NO;
 		_isLoaded = NO;
@@ -99,23 +98,23 @@
 			[_URLRequest setValue:[_params performSelector:@selector(ContentTypeHTTPHeader)] forHTTPHeaderField:@"Content-Type"];
 		}
 		if ([_params respondsToSelector:@selector(HTTPHeaderValueForContentLength)]) {
-			[_URLRequest setValue:[NSString stringWithFormat:@"%d", [_params HTTPHeaderValueForContentLength]] forHTTPHeaderField:@"Content-Length"];
+			[_URLRequest setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[_params HTTPHeaderValueForContentLength]] forHTTPHeaderField:@"Content-Length"];
 		}
 	}
 
-    if (_username != nil) {
-        // Add authentication headers so we don't have to deal with an extra cycle for each message requiring basic auth.
-        CFHTTPMessageRef dummyRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, (CFStringRef)[self HTTPMethod], (CFURLRef)[self URL], kCFHTTPVersion1_1);
-        CFHTTPMessageAddAuthentication(dummyRequest, nil, (CFStringRef)_username, (CFStringRef)_password, kCFHTTPAuthenticationSchemeBasic, FALSE);
-        CFStringRef authorizationString = CFHTTPMessageCopyHeaderFieldValue(dummyRequest, CFSTR("Authorization"));
+	if (_username != nil) {
+		// Add authentication headers so we don't have to deal with an extra cycle for each message requiring basic auth.
+		CFHTTPMessageRef dummyRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, (CFStringRef)[self HTTPMethod], (CFURLRef)[self URL], kCFHTTPVersion1_1);
+		CFHTTPMessageAddAuthentication(dummyRequest, nil, (CFStringRef)_username, (CFStringRef)_password, kCFHTTPAuthenticationSchemeBasic, FALSE);
+		CFStringRef authorizationString = CFHTTPMessageCopyHeaderFieldValue(dummyRequest, CFSTR("Authorization"));
 
-        [_URLRequest setValue:(NSString *)authorizationString forHTTPHeaderField:@"Authorization"];
+		[_URLRequest setValue:(NSString *)authorizationString forHTTPHeaderField:@"Authorization"];
 
-        CFRelease(dummyRequest);
-        CFRelease(authorizationString);
-    }
-	if(logRequest)
-		NSLog(@"Headers: %@", [_URLRequest allHTTPHeaderFields]);
+		CFRelease(dummyRequest);
+		CFRelease(authorizationString);
+	}
+//	if(logRequest)
+//		NSLog(@"Headers: %@", [_URLRequest allHTTPHeaderFields]);
 }
 
 // Setup the NSURLRequest. The request must be prepared right before dispatching
@@ -170,6 +169,7 @@
 								  nil];
 		NSError* error = [NSError errorWithDomain:RKRestKitErrorDomain code:RKRequestBaseURLOfflineError userInfo:userInfo];
 		[self performSelector:@selector(didFailLoadWithError:) withObject:error afterDelay:0.01];
+		_isLoaded = YES;
 	}
 }
 
@@ -181,10 +181,12 @@
 
 	if ([[RKClient sharedClient] isNetworkAvailable]) {
 		[self prepareURLRequest];
-		NSString* body = [[NSString alloc] initWithData:[_URLRequest HTTPBody] encoding:NSUTF8StringEncoding];
 		if(logRequest)
+		{
+			NSString* body = [[NSString alloc] initWithData:[_URLRequest HTTPBody] encoding:NSUTF8StringEncoding];
 			NSLog(@"Sending synchronous %@ request to URL %@. HTTP Body: %@", [self HTTPMethod], [[self URL] absoluteString], body);
-		[body release];
+			[body release];
+		}
 		NSDate* sentAt = [NSDate date];
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self HTTPMethod], @"HTTPMethod", [self URL], @"URL", sentAt, @"sentAt", nil];
 		[[NSNotificationCenter defaultCenter] postNotificationName:kRKRequestSentNotification object:self userInfo:userInfo];
@@ -242,7 +244,7 @@
 	_isLoading = NO;
 	_isLoaded = YES;
 	
-	[self.headersReceiver headersDidReceived:[response allHeaderFields]];
+	[self.headersReceiver headersDidReceive:[response allHeaderFields]];
 
 	if ([_delegate respondsToSelector:@selector(request:didLoadResponse:)]) {
 		[_delegate request:self didLoadResponse:response];
@@ -301,6 +303,23 @@
 
 - (BOOL)wasSentToResourcePath:(NSString*)resourcePath {
 	return [[self resourcePath] isEqualToString:resourcePath];
+}
+
+- (NSString*)description
+{
+	NSMutableString* result = [NSMutableString string];
+	[result appendFormat:@"%@ request to URL %@", [self HTTPMethod], [self.URL absoluteString]];
+	
+	NSDictionary* headers = [self.URLRequest allHTTPHeaderFields];
+	if([[headers allKeys] count])
+		[result appendFormat:@"\nHeaders: %@", headers];
+	
+	NSString* body = [[NSString alloc] initWithData:[_URLRequest HTTPBody] encoding:NSUTF8StringEncoding];
+	if([body length] && [body length] < 2048)
+		[result appendFormat:@"\nBody:\n%@", body];
+	[body release];
+	
+	return result;
 }
 
 @end

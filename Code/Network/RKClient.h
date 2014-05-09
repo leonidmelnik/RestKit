@@ -221,10 +221,12 @@ NSString* RKMakePathWithObject(NSString* path, id object);
  * Update a resource via an HTTP PUT
  */
 - (RKRequest*)put:(NSString*)resourcePath params:(NSObject<RKRequestSerializable>*)params delegate:(NSObject<RKRequestDelegate>*)delegate;
+- (RKRequest*)put:(NSString*)resourcePath params:(NSObject<RKRequestSerializable>*)params successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail;
 
 /**
  * Destroy a resource via an HTTP DELETE
  */
 - (RKRequest*)delete:(NSString*)resourcePath delegate:(NSObject<RKRequestDelegate>*)delegate;
+- (RKRequest*)delete:(NSString*)resourcePath successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail;
 
 @end

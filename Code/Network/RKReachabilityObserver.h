@@ -29,6 +29,10 @@ typedef enum {
 	SCNetworkReachabilityRef _reachabilityRef;	
 }
 
+@property (nonatomic, copy) NSString* hostName;
+
+@property (nonatomic, assign) BOOL hasNetworkAvailabilityBeenDetermined;
+
 /**
  * Create a new reachability observer against a given hostname. The observer
  * will monitor the ability to reach the specified hostname and emit notifications

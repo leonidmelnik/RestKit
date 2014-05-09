@@ -27,7 +27,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 - (id)parseString:(NSString*)string;
 - (void)updateModel:(id)model fromElements:(NSDictionary*)elements;
 
-- (Class)typeClassForProperty:(NSString*)property ofClass:(Class)class;
+- (NSDictionary*)typeClassForProperty:(NSString*)property ofClass:(Class)class;
 - (NSDictionary*)elementToPropertyMappingsForModel:(id)model;
 
 - (id)findOrCreateInstanceOfModelClass:(Class)class fromElements:(NSDictionary*)elements;
@@ -51,6 +51,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 @synthesize localTimeZone = _localTimeZone;
 @synthesize errorsKeyPath = _errorsKeyPath;
 @synthesize errorsConcatenationString = _errorsConcatenationString;
+@synthesize inspector=_inspector;
 
 - (NSArray*)dateFormats
 {
@@ -87,7 +88,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 
 - (void)addDateFormat:(NSString*)dateFormat;
 {
-	[_dateFormats addObject:dateFormat];
+	[_dateFormats insertObject:dateFormat atIndex:0];
 }
 
 - (void)registerClass:(Class<RKObjectMappable>)aClass forElementNamed:(NSString*)elementName {
@@ -141,13 +142,13 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 	if (keyPath) {
 		object = [object valueForKeyPath:keyPath];
 	}
-    
+	
 	if ([object isKindOfClass:[NSDictionary class]]) {
-        if (class) {
-            return [self mapObjectFromDictionary:(NSDictionary*)object toClass:class];
-        } else {
-            return [self mapObjectFromDictionary:(NSDictionary*)object];
-        }
+		if (class) {
+			return [self mapObjectFromDictionary:(NSDictionary*)object toClass:class];
+		} else {
+			return [self mapObjectFromDictionary:(NSDictionary*)object];
+		}
 	} else if ([object isKindOfClass:[NSArray class]]) {
 		if (class) {
 			return [self mapObjectsFromArrayOfDictionaries:(NSArray*)object toClass:class];
@@ -214,7 +215,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 }
 
 - (id)mapObjectFromDictionary:(NSDictionary*)dictionary {
-    // TODO: Makes assumptions about the structure of the JSON...
+	// TODO: Makes assumptions about the structure of the JSON...
 	NSString* elementName = [[dictionary allKeys] objectAtIndex:0];
 	Class class = [_elementToClassMappings objectForKey:elementName];
 	NSDictionary* elements = [dictionary objectForKey:elementName];
@@ -256,7 +257,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 ///////////////////////////////////////////////////////////////////////////////
 // Utility Methods
 
-- (Class)typeClassForProperty:(NSString*)property ofClass:(Class)class {
+- (NSDictionary*)typeClassForProperty:(NSString*)property ofClass:(Class)class {
 	return [[_inspector propertyNamesAndTypesForClass:class] objectForKey:property];
 }
 
@@ -274,16 +275,16 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 		NSString* primaryKeyElement = [class performSelector:@selector(primaryKeyElement)];
 		id primaryKeyValue = [elements objectForKey:primaryKeyElement];
 		object = [[[RKObjectManager sharedManager] objectStore] findOrCreateInstanceOfManagedObject:class
-                                                                                withPrimaryKeyValue:primaryKeyValue];
+																				withPrimaryKeyValue:primaryKeyValue];
 	}
 	// instantiate if object is nil
 	if (object == nil) {
-        if ([class conformsToProtocol:@protocol(RKObjectMappable)] && [class respondsToSelector:@selector(object)]) {
-            object = [class object];
-        } else {
-            // Allow non-RKObjectMappable objecs to pass through to alloc/init. Do we need this?
-            object = [[[class alloc] init] autorelease];
-        }
+		if ([class conformsToProtocol:@protocol(RKObjectMappable)] && [class respondsToSelector:@selector(object)]) {
+			object = [class object];
+		} else {
+			// Allow non-RKObjectMappable objecs to pass through to alloc/init. Do we need this?
+			object = [[[class alloc] init] autorelease];
+		}
 	}
 	
 	return object;
@@ -299,7 +300,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 // Property & Relationship Manipulation
 
 - (void)updateModel:(id)model ifNewPropertyValue:(id)propertyValue forPropertyNamed:(NSString*)propertyName {	
-	id currentValue = [model valueForKey:propertyName];
+	id currentValue = [model valueForKeyPath:propertyName];
 	if (nil == currentValue && nil == propertyValue) {
 		// Don't set the property, both are nil
 	} else if (nil == propertyValue || [propertyValue isKindOfClass:[NSNull class]]) {
@@ -307,7 +308,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 		[model setValue:nil forKey:propertyName];
 	} else if (currentValue == nil || [currentValue isKindOfClass:[NSNull class]]) {
 		// Existing value was nil, just set the property and be happy
-		[model setValue:propertyValue forKey:propertyName];
+		[model setValue:propertyValue forKeyPath:propertyName];
 	} else {
 		SEL comparisonSelector;
 		if ([propertyValue isKindOfClass:[NSString class]]) {
@@ -331,42 +332,123 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 		BOOL areEqual = ComparisonSender(currentValue, comparisonSelector, propertyValue);
 		
 		if (NO == areEqual) {
-			[model setValue:propertyValue forKey:propertyName];
+			[model setValue:propertyValue forKeyPath:propertyName];
 		}
 	}
 }
 
-- (void)setPropertiesOfModel:(id)model fromElements:(NSDictionary*)elements {
+- (NSDictionary*)getPropertyTypeOfPropertyName:(NSString*)propertyName onModelClass:(Class)class
+{
+	NSArray* path = [propertyName componentsSeparatedByString:@"."];
+	Class _class = class;
+	int i = 0;
+	NSDictionary* result = nil;
+	do
+	{
+		// get name
+		NSString* _propertyName = [path objectAtIndex:i];
+		// get type dictionary
+		result = [self typeClassForProperty:_propertyName ofClass:_class];
+		// get property class
+		_class = [result objectForKey:@"class"];
+		i++;
+	} while (i < [path count]);
+	
+	return result;
+}
+
+- (void)setPropertiesOfModel:(id)model fromElements:(NSDictionary*)elements
+{
 	NSDictionary* elementToPropertyMappings = [self elementToPropertyMappingsForModel:model];
-	for (NSString* elementKeyPath in elementToPropertyMappings) {		
+	for (NSString* elementKeyPath in elementToPropertyMappings)
+	{		
 		id elementValue = nil;		
 		BOOL setValue = YES;
 		
-		@try {
+		@try
+		{
 			elementValue = [elements valueForKeyPath:elementKeyPath];
 		}
-		@catch (NSException * e) {
+		@catch (NSException* e)
+		{
 			NSLog(@"[RestKit] RKModelMapper: Unable to find element at keyPath %@ in elements dictionary for %@. Skipping...", elementKeyPath, [model class]);
 			setValue = NO;
 		}
 		
 		// TODO: Need a way to differentiate between a keyPath that exists, but contains a nil
 		// value and one that is not present in the payload. Causes annoying problems!
-		if (nil == elementValue) {
+		if(nil == elementValue)
 			setValue = (_missingElementMappingPolicy == RKSetNilForMissingElementMappingPolicy);
-		}
 		
-		if (setValue) {
+		if (setValue)
+		{
 			id propertyValue = elementValue;
 			NSString* propertyName = [elementToPropertyMappings objectForKey:elementKeyPath];
-			Class class = [self typeClassForProperty:propertyName ofClass:[model class]];
-			if (elementValue != (id)kCFNull && nil != elementValue) {
-				if ([class isEqual:[NSDate class]]) {
-					// seems is bug: when date in ISO 8601 then we don't need convert time to local time zone, because time have +0000
-//					NSDate* date = [self parseDateFromString:(propertyValue)];
-//					propertyValue = [self dateInLocalTime:date];
-					
-					propertyValue = [self parseDateFromString:propertyValue];
+			NSDictionary* dic = [self getPropertyTypeOfPropertyName:propertyName onModelClass:[model class]];
+			RKPropertyType pType = (RKPropertyType)[[dic objectForKey:@"type"] integerValue];
+			if(pType == RKPropertyTypeClass)
+			{
+				Class class = [dic objectForKey:@"class"];
+				if (elementValue != (id)kCFNull && nil != elementValue)
+				{
+					if ([class isEqual:[NSDate class]])
+					{
+						// seems is bug: when date in ISO 8601 then we don't need convert time to local time zone, because time have +0000
+//						NSDate* date = [self parseDateFromString:(propertyValue)];
+//						propertyValue = [self dateInLocalTime:date];
+						
+						propertyValue = [self parseDateFromString:propertyValue];
+					}
+				}
+			}
+			else if([propertyValue isKindOfClass:[NSString class]])
+			{
+				switch(pType)
+				{
+					case RKPropertyTypeChar:
+					case RKPropertyTypeUChar:
+					case RKPropertyTypeShort:
+					case RKPropertyTypeUShort:
+					case RKPropertyTypeInt:
+					case RKPropertyTypeUInt:
+						propertyValue = [NSNumber numberWithInt:[propertyValue intValue]];
+						break;
+					case RKPropertyTypeLong:
+					case RKPropertyTypeULong:
+					case RKPropertyTypeLongLong:
+					case RKPropertyTypeULongLong:
+						propertyValue = [NSNumber numberWithLongLong:[propertyValue longLongValue]];
+						break;
+					case RKPropertyTypeFloat:
+						propertyValue = [NSNumber numberWithFloat:[propertyValue floatValue]];
+						break;
+					case RKPropertyTypeDouble:
+						propertyValue = [NSNumber numberWithFloat:[propertyValue doubleValue]];
+						break;
+					default:
+						break;
+				}
+			}
+			else if([propertyValue isKindOfClass:[NSNull class]])
+			{
+				switch(pType)
+				{
+					case RKPropertyTypeChar:
+					case RKPropertyTypeUChar:
+					case RKPropertyTypeShort:
+					case RKPropertyTypeUShort:
+					case RKPropertyTypeInt:
+					case RKPropertyTypeUInt:
+					case RKPropertyTypeLong:
+					case RKPropertyTypeULong:
+					case RKPropertyTypeLongLong:
+					case RKPropertyTypeULongLong:
+					case RKPropertyTypeFloat:
+					case RKPropertyTypeDouble:
+						propertyValue = [NSNumber numberWithInt:0];
+						break;
+					default:
+						break;
 				}
 			}
 			
@@ -388,37 +470,41 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 			NSLog(@"Caught exception:%@ when trying valueForKeyPath with path:%@ for elements:%@", e, elementKeyPath, elements);
 		}
 		
-        // TODO: Need to send NSSet or NSArray depending on what the property type is...
-        Class collectionClass = [self typeClassForProperty:propertyName ofClass:[object class]];
-//		if ([relationshipElements isKindOfClass:[NSArray class]] || [relationshipElements isKindOfClass:[NSSet class]]) {
-        if ([collectionClass isSubclassOfClass:[NSSet class]] || [collectionClass isSubclassOfClass:[NSArray class]]) {
-			// NOTE: The last part of the keyPath contains the elementName for the mapped destination class of our children
-			NSArray* componentsOfKeyPath = [elementKeyPath componentsSeparatedByString:@"."];
-			Class class = [[[object class] classesForRelationshipMappings] objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
-			if(!class)
-				class = [_elementToClassMappings objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
-            id children = nil;
-            if ([collectionClass isSubclassOfClass:[NSSet class]]) {
-                children = [NSMutableSet setWithCapacity:[relationshipElements count]];
-            } else if ([collectionClass isSubclassOfClass:[NSArray class]]) {
-                children = [NSMutableArray arrayWithCapacity:[relationshipElements count]];
-            }
-            
-			for (NSDictionary* childElements in relationshipElements) {				
-				id child = [self createOrUpdateInstanceOfModelClass:class fromElements:childElements];		
-				if (child) {
-					[(NSMutableArray*)children addObject:child];
+		// TODO: Need to send NSSet or NSArray depending on what the property type is...
+		NSDictionary* dic = [self typeClassForProperty:propertyName ofClass:[object class]];
+		RKPropertyType pType = (RKPropertyType)[[dic objectForKey:@"type"] integerValue];
+		if(pType == RKPropertyTypeClass)
+		{
+			Class collectionClass = [dic objectForKey:@"class"];
+			if ([collectionClass isSubclassOfClass:[NSSet class]] || [collectionClass isSubclassOfClass:[NSArray class]]) {
+				// NOTE: The last part of the keyPath contains the elementName for the mapped destination class of our children
+				NSArray* componentsOfKeyPath = [elementKeyPath componentsSeparatedByString:@"."];
+				Class class = [[[object class] classesForRelationshipMappings] objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
+				if(!class)
+					class = [_elementToClassMappings objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
+				id children = nil;
+				if ([collectionClass isSubclassOfClass:[NSSet class]]) {
+					children = [NSMutableSet setWithCapacity:[relationshipElements count]];
+				} else if ([collectionClass isSubclassOfClass:[NSArray class]]) {
+					children = [NSMutableArray arrayWithCapacity:[relationshipElements count]];
 				}
+				
+				for (NSDictionary* childElements in relationshipElements) {				
+					id child = [self createOrUpdateInstanceOfModelClass:class fromElements:childElements];		
+					if (child) {
+						[(NSMutableArray*)children addObject:child];
+					}
+				}
+				
+				[object setValue:children forKey:propertyName];
+			} else if ([relationshipElements isKindOfClass:[NSDictionary class]]) {
+				NSArray* componentsOfKeyPath = [elementKeyPath componentsSeparatedByString:@"."];
+				Class class = [[[object class] classesForRelationshipMappings] objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
+				if(!class)
+					class = [_elementToClassMappings objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
+				id child = [self createOrUpdateInstanceOfModelClass:class fromElements:relationshipElements];		
+				[object setValue:child forKey:propertyName];
 			}
-			
-			[object setValue:children forKey:propertyName];
-		} else if ([relationshipElements isKindOfClass:[NSDictionary class]]) {
-			NSArray* componentsOfKeyPath = [elementKeyPath componentsSeparatedByString:@"."];
-			Class class = [[[object class] classesForRelationshipMappings] objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
-			if(!class)
-				class = [_elementToClassMappings objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
-			id child = [self createOrUpdateInstanceOfModelClass:class fromElements:relationshipElements];		
-			[object setValue:child forKey:propertyName];
 		}
 	}
 	
@@ -439,7 +525,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 			NSEntityDescription* relationshipDestinationEntity = [[relationshipsByName objectForKey:relationship] destinationEntity];
 			id relationshipDestinationClass = objc_getClass([[relationshipDestinationEntity managedObjectClassName] cStringUsingEncoding:NSUTF8StringEncoding]);
 			RKManagedObject* relationshipValue = [[[RKObjectManager sharedManager] objectStore] findOrCreateInstanceOfManagedObject:relationshipDestinationClass
-                                                                                                                withPrimaryKeyValue:objectPrimaryKeyValue];			
+																												withPrimaryKeyValue:objectPrimaryKeyValue];			
 			if (relationshipValue) {
 				[managedObject setValue:relationshipValue forKey:relationship];
 			}
@@ -472,9 +558,16 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 		}
 		
 		[formatter release];
+		
+		if(!date) // try to detect unix timestamp
+		{
+			NSString* str1 = [string stringByTrimmingCharactersInSet:[NSCharacterSet characterSetWithCharactersInString:@"0123456789."]];
+			if([str1 length] == 0) // string contains just digits and '.'
+				date = [NSDate dateWithTimeIntervalSince1970:[(NSNumber*)string doubleValue]];
+		}
 	}
-	else
-		date = [NSDate dateWithTimeIntervalSince1970:[string doubleValue]];
+	else if([string isKindOfClass:[NSNumber class]])
+		date = [NSDate dateWithTimeIntervalSince1970:[(NSNumber*)string doubleValue]];
 	
 	return date;
 }

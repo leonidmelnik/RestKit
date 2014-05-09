@@ -29,7 +29,7 @@ typedef void (^RKRequestSuccessHandler)(RKRequest* request, RKResponse* response
 typedef void (^RKRequestFailHandler)(RKRequest* request, NSError* error);
 
 @protocol RKRequestHeaderReceiver <NSObject>
-- (void)headersDidReceived:(NSDictionary*)headers;
+- (void)headersDidReceive:(NSDictionary*)headers;
 @end
 
 @interface RKRequest : NSObject {

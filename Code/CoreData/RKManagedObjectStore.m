@@ -39,9 +39,9 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
 	[[NSNotificationCenter defaultCenter] removeObserver:self];
 	[_storeFilename release];
 	_storeFilename = nil;
-    [_managedObjectModel release];
+	[_managedObjectModel release];
 	_managedObjectModel = nil;
-    [_persistentStoreCoordinator release];
+	[_persistentStoreCoordinator release];
 	_persistentStoreCoordinator = nil;
 	[_managedObjectCache release];
 	_managedObjectCache = nil;
@@ -53,7 +53,7 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
  message to the application's managed object context.
  */
 - (NSError*)save {
-    NSError *error = nil;
+	NSError *error = nil;
 	@try {
 		[[self managedObjectContext] save:&error];
 	}
@@ -94,7 +94,7 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
 	NSURL *storeUrl = [NSURL fileURLWithPath: [[self applicationDocumentsDirectory] stringByAppendingPathComponent:_storeFilename]];
 	
 	NSError *error;
-    _persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:_managedObjectModel];
+	_persistentStoreCoordinator = [[NSPersistentStoreCoordinator alloc] initWithManagedObjectModel:_managedObjectModel];
 	
 	// Allow inferred migration from the original version of the application.
 	NSDictionary *options = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -103,7 +103,7 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
 	
 	if (![_persistentStoreCoordinator addPersistentStoreWithType:NSSQLiteStoreType configuration:nil URL:storeUrl options:options error:&error]) {
 		// TODO: Needs to be handled with delegation... Allow the application to handle migration.
-    }
+	}
 }
 
 - (void)deletePersistantStore {
@@ -187,9 +187,9 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
  Returns the path to the application's documents directory.
  */
 - (NSString *)applicationDocumentsDirectory {	
-    NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
-    NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
-    return basePath;
+	NSArray *paths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+	NSString *basePath = ([paths count] > 0) ? [paths objectAtIndex:0] : nil;
+	return basePath;
 }
 
 - (NSManagedObject*)objectWithID:(NSManagedObjectID*)objectID {
@@ -217,7 +217,7 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
 			NSFetchRequest* fetchRequest = [class fetchRequest];
 			[fetchRequest setReturnsObjectsAsFaults:NO];			
 			objects = [class objectsWithFetchRequest:fetchRequest];
-			NSLog(@"Cacheing all %d %@ objects to thread local storage", [objects count], class);
+			NSLog(@"Cacheing all %lu %@ objects to thread local storage", (unsigned long)[objects count], class);
 			NSMutableDictionary* dictionary = [NSMutableDictionary dictionary];
 			NSString* primaryKey = [class performSelector:@selector(primaryKeyProperty)];
 			for (id theObject in objects) {			

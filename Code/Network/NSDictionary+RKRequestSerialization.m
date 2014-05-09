@@ -33,21 +33,21 @@ static NSString *urlEncode(id object) {
 	
 	if([element isKindOfClass:[NSDictionary class]])
 	{
-		for(NSString* key in element)
-		{
-			NSArray* additionalElements = [self URLEncodedElement:[element objectForKey:key]];
-			for(NSString* additionalEl in additionalElements)
-				[result addObject:[NSString stringWithFormat:@"[%@]%@", urlEncode(key), additionalEl]];
-		}
+		[element enumerateKeysAndObjectsUsingBlock:^(id key, id obj, BOOL *stop) {
+			NSString* encKey = urlEncode(key);
+			NSArray* additionalElements = [self URLEncodedElement:obj];
+			[additionalElements enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+				[result addObject:[NSString stringWithFormat:@"[%@]%@", encKey, obj]];
+			}];
+		}];
 	}
 	else if([element isKindOfClass: [NSArray class]])
 	{
-		for(id value in element)
-		{
-			NSArray* additionalElements = [self URLEncodedElement:value];
+		[element enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
+			NSArray* additionalElements = [self URLEncodedElement:obj];
 			for(NSString* additionalEl in additionalElements)
-				[result addObject:[NSString stringWithFormat:@"[%d]%@", [element indexOfObject:value], additionalEl]];
-		}
+				[result addObject:[NSString stringWithFormat:@"[%lu]%@", (unsigned long)idx, additionalEl]];
+		}];
 	}
 	else
 		[result addObject:[NSString stringWithFormat:@"=%@", urlEncode(element)]];

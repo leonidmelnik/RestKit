@@ -5,16 +5,16 @@
 # met:
 # 
 #  1. Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
+#	 notice, this list of conditions and the following disclaimer.
 # 
 #  2. Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
+#	 notice, this list of conditions and the following disclaimer in
+#	 the documentation and/or other materials provided with the
+#	 distribution.
 # 
 #  3. Neither the name of Lloyd Hilaiel nor the names of its
-#     contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission.
+#	 contributors may be used to endorse or promote products derived
+#	 from this software without specific prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -46,23 +46,23 @@ SET(CMAKE_C_FLAGS "-Wall")
 IF (WIN32) 
   ADD_DEFINITIONS(-DWIN32)
   SET(linkFlags "/PDB:NONE /INCREMENTAL:NO /OPT:NOREF /OPT:NOICF")
-  SET(CMAKE_EXE_LINKER_FLAGS    "${linkFlags}"
-      CACHE STRING "YAJL linker flags" FORCE)
+  SET(CMAKE_EXE_LINKER_FLAGS	"${linkFlags}"
+	  CACHE STRING "YAJL linker flags" FORCE)
   SET(CMAKE_EXE_LINKER_FLAGS_DEBUG ""
-      CACHE STRING "YAJL debug linker flags" FORCE)
+	  CACHE STRING "YAJL debug linker flags" FORCE)
   SET(CMAKE_EXE_LINKER_FLAGS_RELEASE
-      CACHE STRING "YAJL release linker flags" FORCE)
+	  CACHE STRING "YAJL release linker flags" FORCE)
   SET(CMAKE_SHARED_LINKER_FLAGS "${linkFlags}"
-      CACHE STRING "YAJL shared linker flags" FORCE)
+	  CACHE STRING "YAJL shared linker flags" FORCE)
   SET(CMAKE_MODULE_LINKER_FLAGS "${linkFlags}"
-      CACHE STRING "YAJL module linker flags" FORCE)
+	  CACHE STRING "YAJL module linker flags" FORCE)
 
   SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /wd4996 /wd4255 /wd4130 /wd4100 /wd4711")
   SET(CMAKE_C_FLAGS_DEBUG "/D DEBUG /Od /Z7")
   SET(CMAKE_C_FLAGS_RELEASE "/D NDEBUG /O2")
 ELSE (WIN32)
   SET(CMAKE_C_FLAGS
-      "${CMAKE_C_FLAGS} -fPIC -ansi -pedantic -Wpointer-arith -Wno-format-y2k -Wstrict-prototypes -Wmissing-declarations -Wnested-externs -Wextra	-Wundef -Wwrite-strings -Wold-style-definition -Wno-missing-field-initializers -Wredundant-decls -Wno-unused-parameter -Wno-sign-compare -Wmissing-prototypes")
+	  "${CMAKE_C_FLAGS} -fPIC -ansi -pedantic -Wpointer-arith -Wno-format-y2k -Wstrict-prototypes -Wmissing-declarations -Wnested-externs -Wextra	-Wundef -Wwrite-strings -Wold-style-definition -Wno-missing-field-initializers -Wredundant-decls -Wno-unused-parameter -Wno-sign-compare -Wmissing-prototypes")
 
   SET(CMAKE_C_FLAGS_DEBUG "-DDEBUG -g")
   SET(CMAKE_C_FLAGS_RELEASE "-DNDEBUG -O2 -Wuninitialized")
@@ -78,6 +78,6 @@ INCLUDE(YAJLDoc.cmake)
 
 # a test target
 ADD_CUSTOM_TARGET(test
-                  ./run_tests.sh ${CMAKE_CURRENT_BINARY_DIR}/test/yajl_test
-                  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
+				  ./run_tests.sh ${CMAKE_CURRENT_BINARY_DIR}/test/yajl_test
+				  WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/test)
 

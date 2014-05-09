@@ -6,16 +6,16 @@
  * met:
  * 
  *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
+ *	 notice, this list of conditions and the following disclaimer.
  * 
  *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
+ *	 notice, this list of conditions and the following disclaimer in
+ *	 the documentation and/or other materials provided with the
+ *	 distribution.
  * 
  *  3. Neither the name of Lloyd Hilaiel nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
+ *	 contributors may be used to endorse or promote products derived
+ *	 from this software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -39,44 +39,44 @@
 
 
 typedef enum {
-    yajl_state_start = 0,
-    yajl_state_parse_complete,
-    yajl_state_parse_error,
-    yajl_state_lexical_error,
-    yajl_state_map_start,
-    yajl_state_map_sep,    
-    yajl_state_map_need_val,
-    yajl_state_map_got_val,
-    yajl_state_map_need_key,
-    yajl_state_array_start,
-    yajl_state_array_got_val,
-    yajl_state_array_need_val
+	yajl_state_start = 0,
+	yajl_state_parse_complete,
+	yajl_state_parse_error,
+	yajl_state_lexical_error,
+	yajl_state_map_start,
+	yajl_state_map_sep,	
+	yajl_state_map_need_val,
+	yajl_state_map_got_val,
+	yajl_state_map_need_key,
+	yajl_state_array_start,
+	yajl_state_array_got_val,
+	yajl_state_array_need_val
 } yajl_state;
 
 struct yajl_handle_t {
-    const yajl_callbacks * callbacks;
-    void * ctx;
-    yajl_lexer lexer;
-    const char * parseError;
-    /* the number of bytes consumed from the last client buffer,
-     * in the case of an error this will be an error offset, in the
-     * case of an error this can be used as the error offset */
-    unsigned int bytesConsumed;
-    /* temporary storage for decoded strings */
-    yajl_buf decodeBuf;
-    /* a stack of states.  access with yajl_state_XXX routines */
-    yajl_bytestack stateStack;
-    /* memory allocation routines */
-    yajl_alloc_funcs alloc;
+	const yajl_callbacks * callbacks;
+	void * ctx;
+	yajl_lexer lexer;
+	const char * parseError;
+	/* the number of bytes consumed from the last client buffer,
+	 * in the case of an error this will be an error offset, in the
+	 * case of an error this can be used as the error offset */
+	unsigned int bytesConsumed;
+	/* temporary storage for decoded strings */
+	yajl_buf decodeBuf;
+	/* a stack of states.  access with yajl_state_XXX routines */
+	yajl_bytestack stateStack;
+	/* memory allocation routines */
+	yajl_alloc_funcs alloc;
 };
 
 yajl_status
 yajl_do_parse(yajl_handle handle, const unsigned char * jsonText,
-              unsigned int jsonTextLen);
+			  unsigned int jsonTextLen);
 
 unsigned char *
 yajl_render_error_string(yajl_handle hand, const unsigned char * jsonText,
-                         unsigned int jsonTextLen, int verbose);
+						 unsigned int jsonTextLen, int verbose);
 
 
 #endif

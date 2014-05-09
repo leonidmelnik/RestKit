@@ -15,6 +15,8 @@ NSString* const kRKStringBoundary = @"0xKhTmLbOuNdArY";
 
 @implementation RKParams
 
+@synthesize length=_length;
+
 + (RKParams*)params {
 	RKParams* params = [[[RKParams alloc] init] autorelease];
 	return params;
@@ -28,7 +30,7 @@ NSString* const kRKStringBoundary = @"0xKhTmLbOuNdArY";
 - (id)init {
 	if (self = [super init]) {
 		_attachments = [NSMutableArray new];
-		_footer       = [[[NSString stringWithFormat:@"--%@--\r\n", kRKStringBoundary] dataUsingEncoding:NSUTF8StringEncoding] retain];
+		_footer	   = [[[NSString stringWithFormat:@"--%@--\r\n", kRKStringBoundary] dataUsingEncoding:NSUTF8StringEncoding] retain];
 		_footerLength = [_footer length];
 	}
 	
@@ -51,12 +53,54 @@ NSString* const kRKStringBoundary = @"0xKhTmLbOuNdArY";
 	return self;
 }
 
-- (RKParamsAttachment*)setValue:(id <NSObject>)value forParam:(NSString*)param {
-	RKParamsAttachment* attachment = [[RKParamsAttachment alloc] initWithName:param value:value];
-	[_attachments addObject:attachment];
-	[attachment release];
+- (NSArray*)URLEncodedElement:(id)element
+{
+	NSMutableArray* result = [NSMutableArray array];
 	
-	return attachment;
+	if([element isKindOfClass:[NSDictionary class]])
+	{
+		for(NSString* key in element)
+		{
+			NSArray* additionalElements = [self URLEncodedElement:[element objectForKey:key]];
+			for(NSString* additionalEl in additionalElements)
+				[result addObject:[NSString stringWithFormat:@"[%@]%@", key, additionalEl]];
+		}
+	}
+	else if([element isKindOfClass: [NSArray class]])
+	{
+		for(id value in element)
+		{
+			NSArray* additionalElements = [self URLEncodedElement:value];
+			for(NSString* additionalEl in additionalElements)
+				[result addObject:[NSString stringWithFormat:@"[%lu]%@", (unsigned long)[element indexOfObject:value], additionalEl]];
+		}
+	}
+	else
+		[result addObject:[NSString stringWithFormat:@"=%@", element]];
+	
+	return result;
+}
+
+- (NSArray*)setValue:(id <NSObject>)value forParam:(NSString*)param {
+	
+	NSArray* additionalElements = [self URLEncodedElement:value];
+	NSMutableArray* result = [NSMutableArray array];
+	for(NSString* additionalEl in additionalElements)
+	{
+		NSArray* keyValue = [[NSString stringWithFormat:@"%@%@", param, additionalEl] componentsSeparatedByString:@"="];
+		if([keyValue count] > 1)
+		{
+			NSString* value_2 = [[keyValue subarrayWithRange:NSMakeRange(1, [keyValue count]-1)] componentsJoinedByString:@"="];
+			RKParamsAttachment* attachment = [[RKParamsAttachment alloc] initWithName:[keyValue objectAtIndex:0]
+																				value:value_2];
+			[result addObject:attachment];
+			[attachment release];
+		}
+	}
+	
+	[_attachments addObjectsFromArray:result];
+	
+	return result;
 }
 
 - (RKParamsAttachment*)setFile:(NSString*)filePath forParam:(NSString*)param {
@@ -123,7 +167,7 @@ NSString* const kRKStringBoundary = @"0xKhTmLbOuNdArY";
 	[_attachments makeObjectsPerformSelector:@selector(open)];
 	
 	// Calculate the length	of the stream
-    _length = _footerLength;	
+	_length = _footerLength;	
 	for (RKParamsAttachment* attachment in _attachments) {
 		_length += [attachment length];
 	}
@@ -134,23 +178,23 @@ NSString* const kRKStringBoundary = @"0xKhTmLbOuNdArY";
 #pragma mark NSInputStream methods
 
 - (NSInteger)read:(uint8_t *)buffer maxLength:(NSUInteger)maxLength {
-    NSUInteger bytesSentInThisRead = 0, bytesRead;
+	NSUInteger bytesSentInThisRead = 0, bytesRead;
 	NSUInteger lengthOfAttachments = (_length - _footerLength);
 	
 	// Proxy the read through to our attachments
-    _streamStatus = NSStreamStatusReading;
-    while (_bytesDelivered < _length && bytesSentInThisRead < maxLength && _currentPart < [_attachments count]) {
-        if ((bytesRead = [[_attachments objectAtIndex:_currentPart] read:buffer + bytesSentInThisRead maxLength:maxLength - bytesSentInThisRead]) == 0) {
-            _currentPart ++;
-            continue;
-        }
+	_streamStatus = NSStreamStatusReading;
+	while (_bytesDelivered < _length && bytesSentInThisRead < maxLength && _currentPart < [_attachments count]) {
+		if ((bytesRead = [[_attachments objectAtIndex:_currentPart] read:buffer + bytesSentInThisRead maxLength:maxLength - bytesSentInThisRead]) == 0) {
+			_currentPart ++;
+			continue;
+		}
 		
-        bytesSentInThisRead += bytesRead;
-        _bytesDelivered += bytesRead;
-    }
+		bytesSentInThisRead += bytesRead;
+		_bytesDelivered += bytesRead;
+	}
 	
 	// If we have sent all the attachments data, begin emitting the boundary footer
-    if ((_bytesDelivered >= lengthOfAttachments) && (bytesSentInThisRead < maxLength)) {
+	if ((_bytesDelivered >= lengthOfAttachments) && (bytesSentInThisRead < maxLength)) {
 		NSUInteger footerBytesSent, footerBytesRemaining, bytesRemainingInBuffer;
 		
 		// Calculate our position in the stream & buffer
@@ -159,14 +203,14 @@ NSString* const kRKStringBoundary = @"0xKhTmLbOuNdArY";
 		bytesRemainingInBuffer = maxLength - bytesSentInThisRead;
 		
 		// Send the entire footer back if there is room
-        bytesRead = (footerBytesRemaining < bytesRemainingInBuffer) ? footerBytesRemaining : bytesRemainingInBuffer;		
-        [_footer getBytes:buffer + bytesSentInThisRead range:NSMakeRange(footerBytesSent, bytesRead)];
+		bytesRead = (footerBytesRemaining < bytesRemainingInBuffer) ? footerBytesRemaining : bytesRemainingInBuffer;		
+		[_footer getBytes:buffer + bytesSentInThisRead range:NSMakeRange(footerBytesSent, bytesRead)];
 		
-        bytesSentInThisRead += bytesRead;
-        _bytesDelivered += bytesRead;
-    }
+		bytesSentInThisRead += bytesRead;
+		_bytesDelivered += bytesRead;
+	}
 	
-    return bytesSentInThisRead;
+	return bytesSentInThisRead;
 }
 
 - (BOOL)getBuffer:(uint8_t **)buffer length:(NSUInteger *)len {
@@ -174,23 +218,23 @@ NSString* const kRKStringBoundary = @"0xKhTmLbOuNdArY";
 }
 
 - (BOOL)hasBytesAvailable {
-    return _bytesDelivered < _length;
+	return _bytesDelivered < _length;
 }
 
 - (void)open {
-    _streamStatus = NSStreamStatusOpen;
+	_streamStatus = NSStreamStatusOpen;
 }
 
 - (void)close {
-    _streamStatus = NSStreamStatusClosed;
+	_streamStatus = NSStreamStatusClosed;
 }
 
 - (NSStreamStatus)streamStatus {
-    if (_streamStatus != NSStreamStatusClosed && _bytesDelivered >= _length) {
-        _streamStatus = NSStreamStatusAtEnd;
-    }
+	if (_streamStatus != NSStreamStatusClosed && _bytesDelivered >= _length) {
+		_streamStatus = NSStreamStatusAtEnd;
+	}
 	
-    return _streamStatus;
+	return _streamStatus;
 }
 
 #pragma mark Core Foundation stream methods

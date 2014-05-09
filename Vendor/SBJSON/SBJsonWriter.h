@@ -94,7 +94,7 @@
 @interface SBJsonWriter : SBJsonBase <SBJsonWriter> {
 
 @private
-    BOOL sortKeys, humanReadable;
+	BOOL sortKeys, humanReadable;
 }
 
 @end
@@ -114,11 +114,11 @@
  
  @code
  - (id)jsonProxyObject {
-    return [NSDictionary dictionaryWithObjectsAndKeys:
-        name, @"name",
-        phone, @"phone",
-        email, @"email",
-        nil];
+	return [NSDictionary dictionaryWithObjectsAndKeys:
+		name, @"name",
+		phone, @"phone",
+		email, @"email",
+		nil];
  }
  @endcode
  

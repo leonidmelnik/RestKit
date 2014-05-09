@@ -72,9 +72,9 @@
  
  */
 @interface SBJsonParser : SBJsonBase <SBJsonParser> {
-    
+	
 @private
-    const char *c;
+	const char *c;
 }
 
 @end

@@ -9,6 +9,24 @@
 #import <Foundation/Foundation.h>
 
 
+typedef enum
+{
+	RKPropertyTypeUnknown,
+	RKPropertyTypeClass,
+	RKPropertyTypeChar,
+	RKPropertyTypeUChar,
+	RKPropertyTypeShort,
+	RKPropertyTypeUShort,
+	RKPropertyTypeInt,
+	RKPropertyTypeUInt,
+	RKPropertyTypeLong,
+	RKPropertyTypeULong,
+	RKPropertyTypeLongLong,
+	RKPropertyTypeULongLong,
+	RKPropertyTypeFloat,
+	RKPropertyTypeDouble
+}RKPropertyType;
+
 @interface RKObjectPropertyInspector : NSObject {
 	NSMutableDictionary* _cachedPropertyNamesAndTypes;
 }

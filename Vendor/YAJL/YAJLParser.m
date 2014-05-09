@@ -66,15 +66,15 @@ NSString *const YAJLParserValueKey = @"YAJLParserValueKey";
 
 - (id)initWithParserOptions:(YAJLParserOptions)parserOptions {
   if ((self = [super init])) {
-    parserOptions_ = parserOptions;   
+	parserOptions_ = parserOptions;   
   }
   return self;
 }
 
 - (void)dealloc {
   if (handle_ != NULL) {
-    yajl_free(handle_);
-    handle_ = NULL;
+	yajl_free(handle_);
+	handle_ = NULL;
   } 
   
   [parserError_ release];
@@ -125,10 +125,10 @@ int yajl_boolean(void *ctx, int boolVal) {
 int ParseDouble(void *ctx, const char *buf, const char *numberVal, unsigned int numberLen) {
   double d = strtod((char *)buf, NULL);
   if ((d == HUGE_VAL || d == -HUGE_VAL) && errno == ERANGE) {
-    NSString *s = [[NSString alloc] initWithBytes:numberVal length:numberLen encoding:NSUTF8StringEncoding];
-    [(id)ctx _cancelWithErrorForStatus:YAJLParserErrorCodeDoubleOverflow message:[NSString stringWithFormat:@"double overflow on '%@'", s] value:s];
-    [s release];
-    return 0;
+	NSString *s = [[NSString alloc] initWithBytes:numberVal length:numberLen encoding:NSUTF8StringEncoding];
+	[(id)ctx _cancelWithErrorForStatus:YAJLParserErrorCodeDoubleOverflow message:[NSString stringWithFormat:@"double overflow on '%@'", s] value:s];
+	[s release];
+	return 0;
   }
   NSNumber *number = [[NSNumber alloc] initWithDouble:d];
   [(id)ctx _add:number];
@@ -142,23 +142,23 @@ int yajl_number(void *ctx, const char *numberVal, unsigned int numberLen) {
   buf[numberLen] = 0;
   
   if (memchr(numberVal, '.', numberLen) || memchr(numberVal, 'e', numberLen) || memchr(numberVal, 'E', numberLen)) {
-    return ParseDouble(ctx, buf, numberVal, numberLen);
+	return ParseDouble(ctx, buf, numberVal, numberLen);
   } else {
-    long long i = strtoll((const char *) buf, NULL, 10);
-    if ((i == LLONG_MIN || i == LLONG_MAX) && errno == ERANGE) {
-      if (([(id)ctx parserOptions] & YAJLParserOptionsStrictPrecision) == YAJLParserOptionsStrictPrecision) {
-        NSString *s = [[NSString alloc] initWithBytes:numberVal length:numberLen encoding:NSUTF8StringEncoding];
-        [(id)ctx _cancelWithErrorForStatus:YAJLParserErrorCodeIntegerOverflow message:[NSString stringWithFormat:@"integer overflow on '%@'", s] value:s];
-        [s release];
-        return 0;
-      } else {
-        // If we integer overflow lets try double precision for HUGE_VAL > double > LLONG_MAX 
-        return ParseDouble(ctx, buf, numberVal, numberLen);
-      }
-    }
-    NSNumber *number = [[NSNumber alloc] initWithLongLong:i];
-    [(id)ctx _add:number];
-    [number release];
+	long long i = strtoll((const char *) buf, NULL, 10);
+	if ((i == LLONG_MIN || i == LLONG_MAX) && errno == ERANGE) {
+	  if (([(id)ctx parserOptions] & YAJLParserOptionsStrictPrecision) == YAJLParserOptionsStrictPrecision) {
+		NSString *s = [[NSString alloc] initWithBytes:numberVal length:numberLen encoding:NSUTF8StringEncoding];
+		[(id)ctx _cancelWithErrorForStatus:YAJLParserErrorCodeIntegerOverflow message:[NSString stringWithFormat:@"integer overflow on '%@'", s] value:s];
+		[s release];
+		return 0;
+	  } else {
+		// If we integer overflow lets try double precision for HUGE_VAL > double > LLONG_MAX 
+		return ParseDouble(ctx, buf, numberVal, numberLen);
+	  }
+	}
+	NSNumber *number = [[NSNumber alloc] initWithLongLong:i];
+	[(id)ctx _add:number];
+	[number release];
   }
   
   return 1;
@@ -240,37 +240,37 @@ yajl_end_array
 
 - (YAJLParserStatus)parse:(NSData *)data {
   if (!handle_) {
-    yajl_parser_config cfg = {
-      ((parserOptions_ & YAJLParserOptionsAllowComments) ? 1 : 0), // allowComments: if nonzero, javascript style comments will be allowed in the input (both /* */ and //)
-      ((parserOptions_ & YAJLParserOptionsCheckUTF8) ? 1 : 0)  // checkUTF8: if nonzero, invalid UTF8 strings will cause a parse error
-    };
-    
-    handle_ = yajl_alloc(&callbacks, &cfg, NULL, self);
-    if (!handle_) { 
-      self.parserError = [self _errorForStatus:YAJLParserErrorCodeAllocError message:@"Unable to allocate YAJL handle" value:nil];
-      return YAJLParserStatusError;
-    } 
+	yajl_parser_config cfg = {
+	  ((parserOptions_ & YAJLParserOptionsAllowComments) ? 1 : 0), // allowComments: if nonzero, javascript style comments will be allowed in the input (both /* */ and //)
+	  ((parserOptions_ & YAJLParserOptionsCheckUTF8) ? 1 : 0)  // checkUTF8: if nonzero, invalid UTF8 strings will cause a parse error
+	};
+	
+	handle_ = yajl_alloc(&callbacks, &cfg, NULL, self);
+	if (!handle_) { 
+	  self.parserError = [self _errorForStatus:YAJLParserErrorCodeAllocError message:@"Unable to allocate YAJL handle" value:nil];
+	  return YAJLParserStatusError;
+	} 
   }
   
   yajl_status status = yajl_parse(handle_, [data bytes], [data length]);
   if (status == yajl_status_client_canceled) {
-    // We cancelled because we encountered an error here in the client;
-    // and parserError should be already set
-    NSAssert(self.parserError, @"Client cancelled, but we have no parserError set");
-    return YAJLParserStatusError;
+	// We cancelled because we encountered an error here in the client;
+	// and parserError should be already set
+	NSAssert(self.parserError, @"Client cancelled, but we have no parserError set");
+	return YAJLParserStatusError;
   } else if (status == yajl_status_error) {
-    unsigned char *errorMessage = yajl_get_error(handle_, 1, [data bytes], [data length]);
-    NSString *errorString = [NSString stringWithUTF8String:(char *)errorMessage];
-    self.parserError = [self _errorForStatus:status message:errorString value:nil];
-    yajl_free_error(handle_, errorMessage);
-    return YAJLParserStatusError;
+	unsigned char *errorMessage = yajl_get_error(handle_, 1, [data bytes], [data length]);
+	NSString *errorString = [NSString stringWithUTF8String:(char *)errorMessage];
+	self.parserError = [self _errorForStatus:status message:errorString value:nil];
+	yajl_free_error(handle_, errorMessage);
+	return YAJLParserStatusError;
   } else if (status == yajl_status_insufficient_data) {
-    return YAJLParserStatusInsufficientData;
+	return YAJLParserStatusInsufficientData;
   } else if (status == yajl_status_ok) {
-    return YAJLParserStatusOK;
+	return YAJLParserStatusOK;
   } else {
-    self.parserError = [self _errorForStatus:status message:[NSString stringWithFormat:@"Unexpected status %d", status] value:nil];
-    return YAJLParserStatusError;
+	self.parserError = [self _errorForStatus:status message:[NSString stringWithFormat:@"Unexpected status %d", status] value:nil];
+	return YAJLParserStatusError;
   }
 }
 

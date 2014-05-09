@@ -6,16 +6,16 @@
  * met:
  * 
  *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
+ *	 notice, this list of conditions and the following disclaimer.
  * 
  *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
+ *	 notice, this list of conditions and the following disclaimer in
+ *	 the documentation and/or other materials provided with the
+ *	 distribution.
  * 
  *  3. Neither the name of Lloyd Hilaiel nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
+ *	 contributors may be used to endorse or promote products derived
+ *	 from this software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -41,25 +41,25 @@
 
 static void * yajl_internal_malloc(void *ctx, unsigned int sz)
 {
-    return malloc(sz);
+	return malloc(sz);
 }
 
 static void * yajl_internal_realloc(void *ctx, void * previous,
-                                    unsigned int sz)
+									unsigned int sz)
 {
-    return realloc(previous, sz);
+	return realloc(previous, sz);
 }
 
 static void yajl_internal_free(void *ctx, void * ptr)
 {
-    free(ptr);
+	free(ptr);
 }
 
 void yajl_set_default_alloc_funcs(yajl_alloc_funcs * yaf)
 {
-    yaf->malloc = yajl_internal_malloc;
-    yaf->free = yajl_internal_free;
-    yaf->realloc = yajl_internal_realloc;
-    yaf->ctx = NULL;
+	yaf->malloc = yajl_internal_malloc;
+	yaf->free = yajl_internal_free;
+	yaf->realloc = yajl_internal_realloc;
+	yaf->ctx = NULL;
 }
 

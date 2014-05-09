@@ -33,18 +33,18 @@ extern NSString * SBJSONErrorDomain;
 
 
 enum {
-    EUNSUPPORTED = 1,
-    EPARSENUM,
-    EPARSE,
-    EFRAGMENT,
-    ECTRL,
-    EUNICODE,
-    EDEPTH,
-    EESCAPE,
-    ETRAILCOMMA,
-    ETRAILGARBAGE,
-    EEOF,
-    EINPUT
+	EUNSUPPORTED = 1,
+	EPARSENUM,
+	EPARSE,
+	EFRAGMENT,
+	ECTRL,
+	EUNICODE,
+	EDEPTH,
+	EESCAPE,
+	ETRAILCOMMA,
+	ETRAILGARBAGE,
+	EEOF,
+	EINPUT
 };
 
 /**
@@ -53,10 +53,10 @@ enum {
  This class contains the common error-handling code and option between the parser/writer.
  */
 @interface SBJsonBase : NSObject {
-    NSMutableArray *errorTrace;
+	NSMutableArray *errorTrace;
 
 @protected
-    NSUInteger depth, maxDepth;
+	NSUInteger depth, maxDepth;
 }
 
 /**

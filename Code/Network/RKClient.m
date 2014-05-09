@@ -184,12 +184,12 @@ NSString* RKMakePathWithObject(NSString* path, id object) {
 
 	[_baseURLReachabilityObserver release];
 	_baseURLReachabilityObserver = nil;
-    
-    // Don't crash if baseURL is nil'd out (i.e. dealloc)
-    if (baseURL) {
-        NSURL* URL = [NSURL URLWithString:baseURL];
-        _baseURLReachabilityObserver = [[RKReachabilityObserver reachabilityObserverWithHostName:[URL host]] retain];
-    }
+	
+	// Don't crash if baseURL is nil'd out (i.e. dealloc)
+	if (baseURL) {
+		NSURL* URL = [NSURL URLWithString:baseURL];
+		_baseURLReachabilityObserver = [[RKReachabilityObserver reachabilityObserverWithHostName:[URL host]] retain];
+	}
 }
 
 - (RKRequest*)requestWithResourcePath:(NSString*)resourcePath delegate:(id)delegate {
@@ -256,9 +256,23 @@ NSString* RKMakePathWithObject(NSString* path, id object) {
 - (RKRequest*)put:(NSString*)resourcePath params:(NSObject<RKRequestSerializable>*)params delegate:(id)delegate {
 	return [self load:resourcePath method:RKRequestMethodPUT params:params delegate:delegate];
 }
+- (RKRequest*)put:(NSString*)resourcePath params:(NSObject<RKRequestSerializable>*)params successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail
+{
+	RKRequest* result = [self load:resourcePath method:RKRequestMethodPUT params:params delegate:nil];
+	result.successHandler = success;
+	result.failHandler = fail;
+	return result;
+}
 
 - (RKRequest*)delete:(NSString*)resourcePath delegate:(id)delegate {
 	return [self load:resourcePath method:RKRequestMethodDELETE params:nil delegate:delegate];
+}
+- (RKRequest*)delete:(NSString *)resourcePath successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail
+{
+	RKRequest* result = [self load:resourcePath method:RKRequestMethodDELETE params:nil delegate:nil];
+	result.successHandler = success;
+	result.failHandler = fail;
+	return result;
 }
 
 @end

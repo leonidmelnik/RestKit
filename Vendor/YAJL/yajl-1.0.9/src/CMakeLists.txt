@@ -5,16 +5,16 @@
 # met:
 # 
 #  1. Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
+#	 notice, this list of conditions and the following disclaimer.
 # 
 #  2. Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
+#	 notice, this list of conditions and the following disclaimer in
+#	 the documentation and/or other materials provided with the
+#	 distribution.
 # 
 #  3. Neither the name of Lloyd Hilaiel nor the names of its
-#     contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission.
+#	 contributors may be used to endorse or promote products derived
+#	 from this software without specific prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -29,7 +29,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 SET (SRCS yajl.c yajl_lex.c yajl_parser.c yajl_buf.c
-          yajl_encode.c yajl_gen.c yajl_alloc.c)
+		  yajl_encode.c yajl_gen.c yajl_alloc.c)
 SET (HDRS yajl_parser.h yajl_lex.h yajl_buf.h yajl_encode.h yajl_alloc.h)
 SET (PUB_HDRS api/yajl_parse.h api/yajl_gen.h api/yajl_common.h)
 
@@ -54,9 +54,9 @@ ADD_LIBRARY(yajl SHARED ${SRCS} ${HDRS} ${PUB_HDRS})
 
 #### setup shared library version number
 SET_TARGET_PROPERTIES(yajl PROPERTIES
-                      DEFINE_SYMBOL YAJL_SHARED
-                      SOVERSION ${YAJL_MAJOR}
-                      VERSION ${YAJL_MAJOR}.${YAJL_MINOR}.${YAJL_MICRO})
+					  DEFINE_SYMBOL YAJL_SHARED
+					  SOVERSION ${YAJL_MAJOR}
+					  VERSION ${YAJL_MAJOR}.${YAJL_MINOR}.${YAJL_MICRO})
 
 #### build up an sdk as a post build step
 
@@ -71,7 +71,7 @@ FOREACH (header ${PUB_HDRS})
   EXEC_PROGRAM(${CMAKE_COMMAND} ARGS -E copy_if_different ${header} ${incDir})
 
   ADD_CUSTOM_COMMAND(TARGET yajl_s POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_if_different ${header} ${incDir})
+	  COMMAND ${CMAKE_COMMAND} -E copy_if_different ${header} ${incDir})
 ENDFOREACH (header ${PUB_HDRS})
 
 INCLUDE_DIRECTORIES(${incDir}/..)

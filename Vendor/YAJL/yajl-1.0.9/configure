@@ -6,16 +6,16 @@
 # met:
 # 
 #  1. Redistributions of source code must retain the above copyright
-#     notice, this list of conditions and the following disclaimer.
+#	 notice, this list of conditions and the following disclaimer.
 # 
 #  2. Redistributions in binary form must reproduce the above copyright
-#     notice, this list of conditions and the following disclaimer in
-#     the documentation and/or other materials provided with the
-#     distribution.
+#	 notice, this list of conditions and the following disclaimer in
+#	 the documentation and/or other materials provided with the
+#	 distribution.
 # 
 #  3. Neither the name of Lloyd Hilaiel nor the names of its
-#     contributors may be used to endorse or promote products derived
-#     from this software without specific prior written permission.
+#	 contributors may be used to endorse or promote products derived
+#	 from this software without specific prior written permission.
 # 
 # THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
 # IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -37,11 +37,11 @@ options = {}
 OptionParser.new do |opts|
   opts.banner = "Usage: configure [options]"
   opts.on("-p", "--prefix PATH", "Set installation prefix") do |p|
-    prefix = p
+	prefix = p
   end
   opts.on_tail("-h", "--help", "Output usage summary") do 
-    puts opts
-    exit
+	puts opts
+	exit
   end
 
   opts.parse!(ARGV)
@@ -54,9 +54,9 @@ puts "== running CMake in build directory"
 FileUtils.mkdir("build")
 FileUtils.cd("build") do 
   if (!system("cmake -DCMAKE_INSTALL_PREFIX='#{prefix}' .."))
-    puts "The \"cmake\" program is required to configure yajl.  It's"
-    puts "available from most ports/packaging systems and http://cmake.org"
-    exit 1
+	puts "The \"cmake\" program is required to configure yajl.  It's"
+	puts "available from most ports/packaging systems and http://cmake.org"
+	exit 1
   end
 end
 

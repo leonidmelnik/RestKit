@@ -36,10 +36,10 @@
 }
 
 - (void)seedDatabaseWithBundledFiles:(NSArray*)fileNames ofType:(NSString*)type {
-	NSLog(@"[RestKit] RKModelSeeder: Seeding database with contents of %d %@ files...", [fileNames count], [type uppercaseString]);
+	NSLog(@"[RestKit] RKModelSeeder: Seeding database with contents of %lu %@ files...", (unsigned long)[fileNames count], [type uppercaseString]);
 	for (NSString* fileName in fileNames) {
 		NSArray* objects = [self seedDatabaseWithBundledFile:fileName ofType:type];
-		NSLog(@"[RestKit] RKModelSeeder: Seeded %d objects from %@...", [objects count], [NSString stringWithFormat:@"%@.%@", fileName, type]);
+		NSLog(@"[RestKit] RKModelSeeder: Seeded %lu objects from %@...", (unsigned long)[objects count], [NSString stringWithFormat:@"%@.%@", fileName, type]);
 	}
 	
 	[self finalizeSeedingAndExit];
@@ -57,7 +57,7 @@
 		NSAssert1([[parseableObjects objectAtIndex:0] isKindOfClass:[NSDictionary class]], @"Expected an array of NSDictionaries, got %@", [objects objectAtIndex:0]);
 		
 		NSArray* mappedObjects = [_manager.mapper mapObjectsFromArrayOfDictionaries:parseableObjects toClass:theClass];
-		NSLog(@"[RestKit] RKModelSeeder: Seeded %d objects from %@...", [mappedObjects count], [NSString stringWithFormat:@"%@.%@", fileName, type]);
+		NSLog(@"[RestKit] RKModelSeeder: Seeded %lu objects from %@...", (unsigned long)[mappedObjects count], [NSString stringWithFormat:@"%@.%@", fileName, type]);
 	} else {
 		NSLog(@"Unable to read file %@ with type %@: %@", fileName, type, [error localizedDescription]);
 	}

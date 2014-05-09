@@ -57,17 +57,31 @@
 
 // Handle basic auth
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-    if ([challenge previousFailureCount] == 0) {
-        NSURLCredential *newCredential;
-        newCredential=[NSURLCredential credentialWithUser:[NSString stringWithFormat:@"%@", _request.username]
-                                                 password:[NSString stringWithFormat:@"%@", _request.password]
-                                              persistence:NSURLCredentialPersistenceNone];
-        [[challenge sender] useCredential:newCredential
-               forAuthenticationChallenge:challenge];
-    } else {
-        [[challenge sender] cancelAuthenticationChallenge:challenge];
-    }
+	if ([challenge previousFailureCount] == 0) {
+		NSURLCredential *newCredential;
+		newCredential=[NSURLCredential credentialWithUser:[NSString stringWithFormat:@"%@", _request.username]
+												 password:[NSString stringWithFormat:@"%@", _request.password]
+											  persistence:NSURLCredentialPersistenceNone];
+		[[challenge sender] useCredential:newCredential
+			   forAuthenticationChallenge:challenge];
+	} else {
+		[[challenge sender] cancelAuthenticationChallenge:challenge];
+	}
 }
+
+//-(void)connection:(NSURLConnection *)connection willSendRequestForAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge
+//{
+//	if ([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust] &&
+//		([challenge.protectionSpace.host hasSuffix:@""]))
+//	{
+//		// accept the certificate anyway
+//		[challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+//	}
+//	else
+//	{
+//		[challenge.sender continueWithoutCredentialForAuthenticationChallenge:challenge];
+//	}
+//}
 
 - (void)dispatchRequestDidStartLoadIfNecessary {
 	if (NO == _loading) {
@@ -249,6 +263,14 @@
 - (BOOL)isJSON {
 	NSString* contentType = [self contentType];
 	return contentType && [contentType rangeOfString:@"application/json" options:NSCaseInsensitiveSearch|NSAnchoredSearch].length > 0;
+}
+
+- (NSString*)description
+{
+	NSMutableString* result = [NSMutableString string];
+	[result appendFormat:@"Response headers: %@", [_httpURLResponse allHeaderFields]];
+	[result appendFormat:@"\nBody:\n%@", [self bodyAsString]];
+	return result;
 }
 
 @end

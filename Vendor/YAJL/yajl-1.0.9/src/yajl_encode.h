@@ -6,16 +6,16 @@
  * met:
  * 
  *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
+ *	 notice, this list of conditions and the following disclaimer.
  * 
  *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
+ *	 notice, this list of conditions and the following disclaimer in
+ *	 the documentation and/or other materials provided with the
+ *	 distribution.
  * 
  *  3. Neither the name of Lloyd Hilaiel nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
+ *	 contributors may be used to endorse or promote products derived
+ *	 from this software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -37,14 +37,14 @@
 #include "api/yajl_gen.h"
 
 void yajl_string_encode2(const yajl_print_t printer,
-                         void * ctx,
-                         const unsigned char * str,
-                         unsigned int length);
+						 void * ctx,
+						 const unsigned char * str,
+						 unsigned int length);
 
 void yajl_string_encode(yajl_buf buf, const unsigned char * str,
-                        unsigned int length);
+						unsigned int length);
 
 void yajl_string_decode(yajl_buf buf, const unsigned char * str,
-                        unsigned int length);
+						unsigned int length);
 
 #endif

@@ -46,6 +46,7 @@ typedef enum {
 	NSString* _errorsKeyPath;
 	NSString* _errorsConcatenationString;
 }
+@property(nonatomic, retain, readonly) RKObjectPropertyInspector* inspector;
 
 /**
  * The format the mapper is using

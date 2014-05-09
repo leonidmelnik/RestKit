@@ -99,7 +99,7 @@ typedef NSUInteger YAJLParserStatus;
   yajl_handle handle_;
   
   __weak id <YAJLParserDelegate> delegate_; // weak
-    
+	
   YAJLParserOptions parserOptions_;
 
   NSError *parserError_;

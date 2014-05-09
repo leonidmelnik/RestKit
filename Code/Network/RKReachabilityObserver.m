@@ -13,7 +13,6 @@
 
 // Constants
 NSString* const RKReachabilityStateChangedNotification = @"RKReachabilityStateChangedNotification";
-static bool hasNetworkAvailabilityBeenDetermined = NO;
 
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
 #pragma unused (target, flags)
@@ -23,7 +22,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	
 	RKReachabilityObserver* observer = (RKReachabilityObserver*) info;
 	
-	hasNetworkAvailabilityBeenDetermined = YES;
+	observer.hasNetworkAvailabilityBeenDetermined = YES;
 	
 	// Post a notification to notify the client that the network reachability changed.
 	[[NSNotificationCenter defaultCenter] postNotificationName:RKReachabilityStateChangedNotification object:observer];
@@ -50,8 +49,10 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	
 	// Try to determine if we have an IP address or a hostname
 	struct sockaddr_in sa;
-    char* hostNameOrIPAddress = (char*) [hostName UTF8String];
+	char* hostNameOrIPAddress = (char*) [hostName UTF8String];
 	int result = inet_pton(AF_INET, hostNameOrIPAddress, &(sa.sin_addr));
+	
+	BOOL netIsDetermined = NO;
 	
 	if (result != 0) {
 		// IP Address
@@ -65,7 +66,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 		reachabilityRef = SCNetworkReachabilityCreateWithAddress(CFAllocatorGetDefault(), (struct sockaddr*)&remote_saddr);
 		
 		// We can immediately determine reachability to an IP address
-		hasNetworkAvailabilityBeenDetermined = YES;
+		netIsDetermined = YES;
 	} else {
 		// Hostname
 		reachabilityRef = SCNetworkReachabilityCreateWithName(CFAllocatorGetDefault(), hostNameOrIPAddress);
@@ -73,6 +74,8 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	
 	if (nil != reachabilityRef) {
 		observer = [[[self alloc] initWithReachabilityRef:reachabilityRef] autorelease];
+		observer.hostName = hostName;
+		observer.hasNetworkAvailabilityBeenDetermined = netIsDetermined;
 	}
 	return observer;
 }
@@ -100,6 +103,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	if (_reachabilityRef) {
 		CFRelease(_reachabilityRef);
 	}
+	self.hostName = nil;
 	[super dealloc];
 }
 
@@ -108,7 +112,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	RKReachabilityNetworkStatus status = RKReachabilityNotReachable;
 	SCNetworkReachabilityFlags flags;
 	
-	if (!hasNetworkAvailabilityBeenDetermined) {
+	if (!self.hasNetworkAvailabilityBeenDetermined) {
 		return RKReachabilityIndeterminate;
 	}
 	
@@ -129,7 +133,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 		if ((((flags & kSCNetworkReachabilityFlagsConnectionOnDemand ) != 0) ||
 			 (flags & kSCNetworkReachabilityFlagsConnectionOnTraffic) != 0)) {
 			// ... and the connection is on-demand (or on-traffic) if the
-			//     calling application is using the CFSocketStream or higher APIs
+			//	 calling application is using the CFSocketStream or higher APIs
 			
 			if ((flags & kSCNetworkReachabilityFlagsInterventionRequired) == 0) {
 				// ... and no [user] intervention is needed
@@ -139,7 +143,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 		
 		if ((flags & kSCNetworkReachabilityFlagsIsWWAN) == kSCNetworkReachabilityFlagsIsWWAN) {
 			// ... but WWAN connections are OK if the calling application
-			//     is using the CFNetwork (CFSocketStream?) APIs.
+			//	 is using the CFNetwork (CFSocketStream?) APIs.
 			status = RKReachabilityReachableViaWWAN;
 		}
 	}

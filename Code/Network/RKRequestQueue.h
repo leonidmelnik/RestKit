@@ -16,7 +16,7 @@
 @interface RKRequestQueue : NSObject {
 	NSMutableArray* _requests;
 	NSInteger		_totalLoading;
-	NSTimer*        _queueTimer;
+	NSTimer*		_queueTimer;
 	BOOL			_suspended;
 }
 

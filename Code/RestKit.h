@@ -8,5 +8,5 @@
 
 #import "Network/Network.h"
 #import "Support/Support.h"
-#import "Support/JSON/SBJSON/JSON.h"
+#import "JSONParser+SBJSON/JSON.h"
 #import "ObjectMapping/ObjectMapping.h"

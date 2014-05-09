@@ -6,16 +6,16 @@
  * met:
  * 
  *  1. Redistributions of source code must retain the above copyright
- *     notice, this list of conditions and the following disclaimer.
+ *	 notice, this list of conditions and the following disclaimer.
  * 
  *  2. Redistributions in binary form must reproduce the above copyright
- *     notice, this list of conditions and the following disclaimer in
- *     the documentation and/or other materials provided with the
- *     distribution.
+ *	 notice, this list of conditions and the following disclaimer in
+ *	 the documentation and/or other materials provided with the
+ *	 distribution.
  * 
  *  3. Neither the name of Lloyd Hilaiel nor the names of its
- *     contributors may be used to endorse or promote products derived
- *     from this software without specific prior written permission.
+ *	 contributors may be used to endorse or promote products derived
+ *	 from this software without specific prior written permission.
  * 
  * THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
  * IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
@@ -35,7 +35,7 @@
 
 #ifdef __cplusplus
 extern "C" {
-#endif    
+#endif	
 
 #define YAJL_MAX_DEPTH 128
 
@@ -44,9 +44,9 @@ extern "C" {
  * DLL, you must define YAJL_SHARED and WIN32 */
 #if defined(WIN32) && defined(YAJL_SHARED)
 #  ifdef YAJL_BUILD
-#    define YAJL_API __declspec(dllexport)
+#	define YAJL_API __declspec(dllexport)
 #  else
-#    define YAJL_API __declspec(dllimport)
+#	define YAJL_API __declspec(dllimport)
 #  endif
 #else
 #  define YAJL_API
@@ -67,19 +67,19 @@ typedef void * (*yajl_realloc_func)(void *ctx, void * ptr, unsigned int sz);
  *  client to specify memory allocation functions to be used. */
 typedef struct
 {
-    /** pointer to a function that can allocate uninitialized memory */
-    yajl_malloc_func malloc;
-    /** pointer to a function that can resize memory allocations */
-    yajl_realloc_func realloc;
-    /** pointer to a function that can free memory allocated using
-     *  reallocFunction or mallocFunction */
-    yajl_free_func free;
-    /** a context pointer that will be passed to above allocation routines */
-    void * ctx;
+	/** pointer to a function that can allocate uninitialized memory */
+	yajl_malloc_func malloc;
+	/** pointer to a function that can resize memory allocations */
+	yajl_realloc_func realloc;
+	/** pointer to a function that can free memory allocated using
+	 *  reallocFunction or mallocFunction */
+	yajl_free_func free;
+	/** a context pointer that will be passed to above allocation routines */
+	void * ctx;
 } yajl_alloc_funcs;
 
 #ifdef __cplusplus
 }
-#endif    
+#endif	
 
 #endif

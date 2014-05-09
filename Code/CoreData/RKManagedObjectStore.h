@@ -19,7 +19,7 @@ extern NSString* const RKManagedObjectStoreDidFailSaveNotification;
 
 @interface RKManagedObjectStore : NSObject {
 	NSString* _storeFilename;	
-    NSManagedObjectModel* _managedObjectModel;
+	NSManagedObjectModel* _managedObjectModel;
 	NSPersistentStoreCoordinator* _persistentStoreCoordinator;
 	NSObject<RKManagedObjectCache>* _managedObjectCache;
 }

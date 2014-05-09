@@ -276,7 +276,7 @@
 		if ([response isSuccessful] && [response isJSON]) {
 			[self performSelectorInBackground:@selector(processLoadModelsInBackground:) withObject:response];
 		} else {
-			NSLog(@"Encountered unexpected response code: %d (MIME Type: %@)", response.statusCode, response.MIMEType);
+			NSLog(@"Encountered unexpected response code: %ld (MIME Type: %@)", (long)response.statusCode, response.MIMEType);
 			if ([_delegate respondsToSelector:@selector(objectLoaderDidLoadUnexpectedResponse:)]) {
 				[(NSObject<RKObjectLoaderDelegate>*)_delegate objectLoaderDidLoadUnexpectedResponse:self];
 			}

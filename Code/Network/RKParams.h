@@ -26,6 +26,8 @@
 	NSUInteger _currentPart;
 }
 
+@property (nonatomic, assign, readonly) NSUInteger length;
+
 /**
  * Returns an empty params object ready for population
  */
@@ -44,7 +46,7 @@
 /**
  * Sets the value for a named parameter
  */
-- (RKParamsAttachment*)setValue:(id <NSObject>)value forParam:(NSString*)param;
+- (NSArray*)setValue:(id <NSObject>)value forParam:(NSString*)param;
 
 /**
  * Sets the value for a named parameter to the data contained in a file at the given path

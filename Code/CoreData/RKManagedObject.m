@@ -129,7 +129,7 @@
 	id primaryKeyValue = nil;
 	if ([value isKindOfClass:[NSString class]]) {
 		// Cast from string to a number
-		primaryKeyValue = [NSNumber numberWithInt:[(NSString*)value integerValue]];
+		primaryKeyValue = [NSNumber numberWithInt:(int)[(NSString*)value integerValue]];
 	} else {
 		// Make blind assumption here.
 		primaryKeyValue = value;
@@ -166,8 +166,8 @@
 }
 
 - (BOOL)isNew {
-    NSDictionary *vals = [self committedValuesForKeys:nil];
-    return [vals count] == 0;
+	NSDictionary *vals = [self committedValuesForKeys:nil];
+	return [vals count] == 0;
 }
 
 @end

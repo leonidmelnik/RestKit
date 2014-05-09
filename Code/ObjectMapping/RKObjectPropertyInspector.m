@@ -40,6 +40,46 @@
 	return type;
 }
 
+- (RKPropertyType)getPropertyTypeFromAttributes:(NSString*)attributes
+{
+	if([attributes length] > 1)
+	{
+		NSString* two = [attributes substringToIndex:2];
+		
+		if([two isEqualToString:@"T@"])
+			return RKPropertyTypeClass;
+		
+		if([two isEqualToString:@"Ti"])
+			return RKPropertyTypeInt;
+		if([two isEqualToString:@"TI"])
+			return RKPropertyTypeUInt;
+		if([two isEqualToString:@"Tc"])
+			return RKPropertyTypeChar;
+		if([two isEqualToString:@"TC"])
+			return RKPropertyTypeUChar;
+		if([two isEqualToString:@"Ts"])
+			return RKPropertyTypeShort;
+		if([two isEqualToString:@"TS"])
+			return RKPropertyTypeUShort;
+		
+		if([two isEqualToString:@"Tl"])
+			return RKPropertyTypeLong;
+		if([two isEqualToString:@"TL"])
+			return RKPropertyTypeULong;
+		if([two isEqualToString:@"Tq"])
+			return RKPropertyTypeLongLong;
+		if([two isEqualToString:@"TQ"])
+			return RKPropertyTypeULongLong;
+		
+		if([two isEqualToString:@"Tf"])
+			return RKPropertyTypeFloat;
+		if([two isEqualToString:@"Td"])
+			return RKPropertyTypeDouble;
+	}
+	
+	return RKPropertyTypeUnknown;
+}
+
 - (NSDictionary *)propertyNamesAndTypesForClass:(Class)class {
 	NSMutableDictionary* propertyNames = [_cachedPropertyNamesAndTypes objectForKey:class];
 	if (propertyNames) {
@@ -66,12 +106,20 @@
 			propName = [NSString stringWithCString:property_getName(*prop) encoding:NSUTF8StringEncoding];
 			
 			if (![propName isEqualToString:@"_mapkit_hasPanoramaID"]) {
-				const char* className = [[self propertyTypeFromAttributeString:attributeString] cStringUsingEncoding:NSUTF8StringEncoding];
-				Class class = objc_getClass(className);
-				// TODO: Use an id type if unable to get the class??
-				if (class) {
-					[propertyNames setObject:class forKey:propName];
+				
+				RKPropertyType type = [self getPropertyTypeFromAttributes:attributeString];
+				
+				if(type == RKPropertyTypeClass)
+				{
+					const char* className = [[self propertyTypeFromAttributeString:attributeString] cStringUsingEncoding:NSUTF8StringEncoding];
+					Class class = objc_getClass(className);
+					// TODO: Use an id type if unable to get the class??
+					if (class) {
+						[propertyNames setObject:@{@"type" : @(type), @"class" : class} forKey:propName];
+					}
 				}
+				else if(type != RKPropertyTypeUnknown)
+					[propertyNames setObject:@{@"type" : @(type)} forKey:propName];
 			}
 		}
 		

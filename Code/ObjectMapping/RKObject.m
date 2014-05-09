@@ -43,15 +43,23 @@
 		NSMutableDictionary* dic = [NSMutableDictionary dictionaryWithDictionary:[[self class] elementToPropertyMappings]];
 		
 		for(NSString* key in [dic allKeys])
-			[self setValue:[aDecoder decodeObjectForKey:key] forKey:[dic objectForKey:key]];
+		{
+			id obj = [aDecoder decodeObjectForKey:key];
+			if(obj)
+				[self setValue:obj forKey:[dic objectForKey:key]];
+		}
 		
 		if([[self class] respondsToSelector:@selector(elementToRelationshipMappings)])
 			for(NSString* key in [[[self class] elementToRelationshipMappings] allKeys])
 				if([[[[self class] classesForRelationshipMappings] objectForKey:key] conformsToProtocol:@protocol(NSCoding)])
 				{
-					id obj = [NSKeyedUnarchiver unarchiveObjectWithData:[aDecoder decodeObjectForKey:key]];
-					if(obj)
-						[self setValue:obj forKey:[[[self class] elementToRelationshipMappings] objectForKey:key]];
+					NSData* data = [aDecoder decodeObjectForKey:key];
+					if(data)
+					{
+						id obj = [NSKeyedUnarchiver unarchiveObjectWithData:data];
+						if(obj)
+							[self setValue:obj forKey:[[[self class] elementToRelationshipMappings] objectForKey:key]];
+					}
 				}
 	}
 	return self;
@@ -62,14 +70,29 @@
 	NSMutableDictionary* dic = [NSMutableDictionary dictionaryWithDictionary:[[self class] elementToPropertyMappings]];
 	
 	for(NSString* key in [dic allKeys])
-		if([self valueForKey:[dic objectForKey:key]])
+	{
+		NSString* _key = [dic objectForKey:key];
+		if([_key length] && [self valueForKey:_key])
 			[aCoder encodeObject:[self valueForKey:[dic objectForKey:key]] forKey:key];
+	}
 	
 	if([[self class] respondsToSelector:@selector(elementToRelationshipMappings)])
-		for(NSString* key in [[[self class] elementToRelationshipMappings] allKeys])
-			if([[[[self class] classesForRelationshipMappings] objectForKey:key] conformsToProtocol:@protocol(NSCoding)])
-				if([self valueForKey:[[[self class] elementToRelationshipMappings] objectForKey:key]])
-					[aCoder encodeObject:[NSKeyedArchiver archivedDataWithRootObject:[self valueForKey:[[[self class] elementToRelationshipMappings] objectForKey:key]]] forKey:key];
+	{
+		NSArray* allKeys = [[[self class] elementToRelationshipMappings] allKeys];
+		for(NSString* key in allKeys)
+		{
+			if([key length])
+			{
+				Class class = [[[self class] classesForRelationshipMappings] objectForKey:key];
+				if([class conformsToProtocol:@protocol(NSCoding)])
+				{
+					NSString* _key = [[[self class] elementToRelationshipMappings] objectForKey:key];
+					if([_key length] && [self valueForKey:_key])
+						[aCoder encodeObject:[NSKeyedArchiver archivedDataWithRootObject:[self valueForKey:_key]] forKey:key];
+				}
+			}
+		}
+	}
 }
 
 #pragma mark -
@@ -101,6 +124,23 @@
 - (void)mapFromDictionary:(NSDictionary*)dic
 {
 	[[[RKObjectManager sharedManager] mapper] mapObject:self fromDictionary:dic];
+}
+
+#pragma mark -
+#pragma mark Properties copying
+
+- (void)copyPropertiesFromObject:(RKObject*)object
+{
+	NSMutableDictionary* dic = [NSMutableDictionary dictionaryWithDictionary:[[self class] elementToPropertyMappings]];
+	[dic addEntriesFromDictionary:[[self class] elementToRelationshipMappings]];
+	NSString* _key;
+	for(NSString* key in [dic allKeys])
+	{
+		_key = [dic objectForKey:key];
+		id obj = [object valueForKey:_key];
+		if(obj)
+			[self setValue:obj forKey:_key];
+	}
 }
 
 @end
