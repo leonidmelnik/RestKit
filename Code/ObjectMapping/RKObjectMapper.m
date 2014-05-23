@@ -534,8 +534,10 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 }
 
 - (void)updateModel:(id)model fromElements:(NSDictionary*)elements {
+	[model before];
 	[self setPropertiesOfModel:model fromElements:elements];
 	[self setRelationshipsOfModel:model fromElements:elements];
+	[model after];
 }
 
 ///////////////////////////////////////////////////////////////////////////////

@@ -32,6 +32,16 @@
 	return RKObjectMappableGetPropertiesByElement(self);
 }
 
+- (void)before
+{
+	
+}
+
+- (void)after
+{
+	
+}
+
 #pragma mark -
 #pragma mark NSCoding
 
