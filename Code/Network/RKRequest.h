@@ -50,6 +50,7 @@ typedef void (^RKRequestFailHandler)(RKRequest* request, NSError* error);
 @property (nonatomic, copy) RKRequestSuccessHandler successHandler;
 @property (nonatomic, copy) RKRequestFailHandler failHandler;
 @property (nonatomic, assign) id<RKRequestHeaderReceiver> headersReceiver;
+@property (nonatomic, retain) NSString* resourseUrl;
 
 /**
  * The URL this request is loading

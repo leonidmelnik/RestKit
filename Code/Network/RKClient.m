@@ -212,6 +212,7 @@ NSString* RKMakePathWithObject(NSString* path, id object) {
 - (RKRequest*)load:(NSString*)resourcePath method:(RKRequestMethod)method params:(NSObject<RKRequestSerializable>*)params delegate:(id)delegate shouldLog:(BOOL)shouldLog
 {
 	RKRequest* request = [[RKRequest alloc] initWithURL:[self URLForResourcePath:resourcePath] delegate:delegate];
+	request.resourseUrl = resourcePath;
 	[request setHeadersReceiver:self.headersReseiver];
 	request.logRequest = shouldLog;
 	[self setupRequest:request];

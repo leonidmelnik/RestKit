@@ -69,6 +69,7 @@
 	
 	self.successHandler = nil;
 	self.failHandler = nil;
+	self.resourseUrl = nil;
 	
 	[super dealloc];
 }
