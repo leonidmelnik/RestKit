@@ -36,7 +36,6 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 - (void)updateModel:(id)model ifNewPropertyValue:(id)propertyValue forPropertyNamed:(NSString*)propertyName; // Rename!
 - (void)setPropertiesOfModel:(id)model fromElements:(NSDictionary*)elements;
 - (void)setRelationshipsOfModel:(id)object fromElements:(NSDictionary*)elements;
-- (void)updateModel:(id)model fromElements:(NSDictionary*)elements;
 
 - (NSDate*)parseDateFromString:(NSString*)string;
 - (NSDate*)dateInLocalTime:(NSDate*)date;
@@ -292,7 +291,9 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 
 - (id)createOrUpdateInstanceOfModelClass:(Class)class fromElements:(NSDictionary*)elements {
 	id model = [self findOrCreateInstanceOfModelClass:class fromElements:elements];
+	[model before];
 	[self updateModel:model fromElements:elements];
+	[model after];
 	return model;
 }
 
@@ -305,7 +306,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 		// Don't set the property, both are nil
 	} else if (nil == propertyValue || [propertyValue isKindOfClass:[NSNull class]]) {
 		// Clear out the value to reset it
-		[model setValue:nil forKey:propertyName];
+		[model setValue:nil forKeyPath:propertyName];
 	} else if (currentValue == nil || [currentValue isKindOfClass:[NSNull class]]) {
 		// Existing value was nil, just set the property and be happy
 		[model setValue:propertyValue forKeyPath:propertyName];
@@ -502,7 +503,9 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 				Class class = [[[object class] classesForRelationshipMappings] objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
 				if(!class)
 					class = [_elementToClassMappings objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
-				id child = [self createOrUpdateInstanceOfModelClass:class fromElements:relationshipElements];		
+				id child = [object valueForKeyPath:propertyName];
+				if(!child)
+					child = [self createOrUpdateInstanceOfModelClass:class fromElements:relationshipElements];		
 				[object setValue:child forKey:propertyName];
 			}
 		}
@@ -534,10 +537,8 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 }
 
 - (void)updateModel:(id)model fromElements:(NSDictionary*)elements {
-	[model before];
 	[self setPropertiesOfModel:model fromElements:elements];
 	[self setRelationshipsOfModel:model fromElements:elements];
-	[model after];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
