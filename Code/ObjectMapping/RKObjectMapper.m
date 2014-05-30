@@ -291,9 +291,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 
 - (id)createOrUpdateInstanceOfModelClass:(Class)class fromElements:(NSDictionary*)elements {
 	id model = [self findOrCreateInstanceOfModelClass:class fromElements:elements];
-	[model before];
 	[self updateModel:model fromElements:elements];
-	[model after];
 	return model;
 }
 
@@ -505,7 +503,9 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 					class = [_elementToClassMappings objectForKey:[componentsOfKeyPath objectAtIndex:[componentsOfKeyPath count] - 1]];
 				id child = [object valueForKeyPath:propertyName];
 				if(!child)
-					child = [self createOrUpdateInstanceOfModelClass:class fromElements:relationshipElements];		
+					child = [self createOrUpdateInstanceOfModelClass:class fromElements:relationshipElements];
+				else
+					[self mapObject:child fromDictionary:relationshipElements];
 				[object setValue:child forKey:propertyName];
 			}
 		}
@@ -537,8 +537,10 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 }
 
 - (void)updateModel:(id)model fromElements:(NSDictionary*)elements {
+	[model before];
 	[self setPropertiesOfModel:model fromElements:elements];
 	[self setRelationshipsOfModel:model fromElements:elements];
+	[model after];
 }
 
 ///////////////////////////////////////////////////////////////////////////////
