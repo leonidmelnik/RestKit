@@ -51,6 +51,8 @@
 		
 		if([two isEqualToString:@"Ti"])
 			return RKPropertyTypeInt;
+		if([two isEqualToString:@"TB"])
+			return RKPropertyTypeInt;
 		if([two isEqualToString:@"TI"])
 			return RKPropertyTypeUInt;
 		if([two isEqualToString:@"Tc"])
@@ -120,6 +122,8 @@
 				}
 				else if(type != RKPropertyTypeUnknown)
 					[propertyNames setObject:@{@"type" : @(type)} forKey:propName];
+				else
+					NSLog(@"UNKNOWN: %@ (%@)", propName, attributeString);
 			}
 		}
 		
