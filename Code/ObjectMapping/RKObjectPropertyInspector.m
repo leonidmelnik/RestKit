@@ -122,7 +122,7 @@
 				}
 				else if(type != RKPropertyTypeUnknown)
 					[propertyNames setObject:@{@"type" : @(type)} forKey:propName];
-				else
+				else if(![propName isEqualToString:@"accessibilityFrame"] && ![propName isEqualToString:@"accessibilityActivationPoint"])
 					NSLog(@"UNKNOWN: %@ (%@)", propName, attributeString);
 			}
 		}
