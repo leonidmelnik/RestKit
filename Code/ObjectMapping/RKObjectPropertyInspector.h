@@ -13,6 +13,7 @@ typedef enum
 {
 	RKPropertyTypeUnknown,
 	RKPropertyTypeClass,
+	RKPropertyTypeBool,
 	RKPropertyTypeChar,
 	RKPropertyTypeUChar,
 	RKPropertyTypeShort,

@@ -49,6 +49,8 @@
 		if([two isEqualToString:@"T@"])
 			return RKPropertyTypeClass;
 		
+		if([two isEqualToString:@"TB"] || [two isEqualToString:@"Tb"])
+			return RKPropertyTypeBool;
 		if([two isEqualToString:@"Ti"])
 			return RKPropertyTypeInt;
 		if([two isEqualToString:@"TB"])

@@ -404,6 +404,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 			{
 				switch(pType)
 				{
+					case RKPropertyTypeBool:
 					case RKPropertyTypeChar:
 					case RKPropertyTypeUChar:
 					case RKPropertyTypeShort:
@@ -432,6 +433,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 			{
 				switch(pType)
 				{
+					case RKPropertyTypeBool:
 					case RKPropertyTypeChar:
 					case RKPropertyTypeUChar:
 					case RKPropertyTypeShort:
