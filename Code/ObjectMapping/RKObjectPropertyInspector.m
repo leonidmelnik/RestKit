@@ -124,8 +124,14 @@
 				}
 				else if(type != RKPropertyTypeUnknown)
 					[propertyNames setObject:@{@"type" : @(type)} forKey:propName];
-				else if(![propName isEqualToString:@"accessibilityFrame"] && ![propName isEqualToString:@"accessibilityActivationPoint"])
-					NSLog(@"UNKNOWN: %@ (%@)", propName, attributeString);
+				else
+				{
+					static NSArray* props = nil;
+					if(!props)
+						props = @[@"accessibilityFrame", @"accessibilityActivationPoint", @"classForKeyedArchiver", @"observationInfo", @"superclass"];
+					if(![[props filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"%@ in SELF", propName]] count])
+						NSLog(@"UNKNOWN: %@ (%@)", propName, attributeString);
+				}
 			}
 		}
 		
