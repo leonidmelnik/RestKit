@@ -128,7 +128,7 @@
 				{
 					static NSArray* props = nil;
 					if(!props)
-						props = @[@"accessibilityFrame", @"accessibilityActivationPoint", @"classForKeyedArchiver", @"observationInfo", @"superclass"];
+						props = [@[@"accessibilityFrame", @"accessibilityActivationPoint", @"classForKeyedArchiver", @"observationInfo", @"superclass"] retain];
 					if(![[props filteredArrayUsingPredicate:[NSPredicate predicateWithFormat:@"%@ in SELF", propName]] count])
 						NSLog(@"UNKNOWN: %@ (%@)", propName, attributeString);
 				}
