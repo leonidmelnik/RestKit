@@ -10,6 +10,7 @@
 #import <CoreData/CoreData.h>
 #import "RKRequestSerializable.h"
 #import "RKJSONSerialization.h"
+#import <CoreGraphics/CGBase.h>
 
 /**
  * HTTP methods for requests
@@ -27,6 +28,7 @@ typedef enum RKRequestMethod {
 
 typedef void (^RKRequestSuccessHandler)(RKRequest* request, RKResponse* response);
 typedef void (^RKRequestFailHandler)(RKRequest* request, NSError* error);
+typedef void (^RKRequestProgressHandler)(RKRequest* request, NSInteger totalBytesWritten, NSInteger totalBytesExpectedToWrite);
 
 @protocol RKRequestHeaderReceiver <NSObject>
 - (void)headersDidReceive:(NSDictionary*)headers;
@@ -49,6 +51,7 @@ typedef void (^RKRequestFailHandler)(RKRequest* request, NSError* error);
 
 @property (nonatomic, copy) RKRequestSuccessHandler successHandler;
 @property (nonatomic, copy) RKRequestFailHandler failHandler;
+@property (nonatomic, copy) RKRequestProgressHandler progressHandler;
 @property (nonatomic, assign) id<RKRequestHeaderReceiver> headersReceiver;
 @property (nonatomic, retain) NSString* resourseUrl;
 
@@ -152,6 +155,8 @@ typedef void (^RKRequestFailHandler)(RKRequest* request, NSError* error);
  * has completed with a response.
  */
 - (void)didFinishLoad:(RKResponse*)response;
+
+- (void)request:(RKRequest*)request didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite;
 
 /**
  * Cancels the underlying URL connection

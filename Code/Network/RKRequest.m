@@ -269,6 +269,14 @@
 	}
 }
 
+- (void)request:(RKRequest*)request didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite
+{
+	if ([self.delegate respondsToSelector:@selector(request:didSendBodyData:totalBytesWritten:totalBytesExpectedToWrite:)])
+		[self.delegate request:self didSendBodyData:bytesWritten totalBytesWritten:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
+	if(self.progressHandler)
+		self.progressHandler(self, totalBytesWritten, totalBytesExpectedToWrite);
+}
+
 - (BOOL)isGET {
 	return _method == RKRequestMethodGET;
 }
