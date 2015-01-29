@@ -162,7 +162,9 @@
 
 		_isLoading = YES;
 		RKResponse* response = [[[RKResponse alloc] initWithRequest:self] autorelease];
-		_connection = [[NSURLConnection connectionWithRequest:_URLRequest delegate:response] retain];
+		_connection = [[NSURLConnection alloc] initWithRequest:_URLRequest delegate:response startImmediately:NO];
+		[_connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
+		[_connection start];
 	} else {
 		NSString* errorMessage = [NSString stringWithFormat:@"The client is unable to contact the resource at %@", [[self URL] absoluteString]];
 		NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
