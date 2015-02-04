@@ -177,5 +177,6 @@ typedef enum {
  * Format date to first date format
  */
 - (NSString*)stringfromDate:(NSDate*)date;
+- (NSDate*)parseDateFromString:(NSString*)string;
 
 @end
