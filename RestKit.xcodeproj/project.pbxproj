@@ -219,6 +219,8 @@
 		73C89EF312A5BB9A000FE600 /* RKReachabilityObserver.m in Sources */ = {isa = PBXBuildFile; fileRef = 73C89EF012A5BB9A000FE600 /* RKReachabilityObserver.m */; };
 		73FE56C7126CB91600E0F30B /* RKURL.h in Headers */ = {isa = PBXBuildFile; fileRef = 73FE56C4126CB91600E0F30B /* RKURL.h */; };
 		73FE56C8126CB91600E0F30B /* RKURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 73FE56C5126CB91600E0F30B /* RKURL.m */; };
+		B303A8251AC19BD3004A4782 /* NSURL+RKAdditions.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = B303A8231AC19BD3004A4782 /* NSURL+RKAdditions.h */; };
+		B303A8261AC19BD3004A4782 /* NSURL+RKAdditions.m in Copy Headers */ = {isa = PBXBuildFile; fileRef = B303A8241AC19BD3004A4782 /* NSURL+RKAdditions.m */; };
 		B3F09E8E147FC1220046CDCC /* SBJSON.m in Sources */ = {isa = PBXBuildFile; fileRef = B3F09E8A147FC10F0046CDCC /* SBJSON.m */; };
 		B3F09E8F147FC1280046CDCC /* SBJSON.h in Headers */ = {isa = PBXBuildFile; fileRef = B3F09E89147FC10F0046CDCC /* SBJSON.h */; };
 /* End PBXBuildFile section */
@@ -489,6 +491,8 @@
 			dstPath = include/RestKit;
 			dstSubfolderSpec = 16;
 			files = (
+				B303A8251AC19BD3004A4782 /* NSURL+RKAdditions.h in Copy Headers */,
+				B303A8261AC19BD3004A4782 /* NSURL+RKAdditions.m in Copy Headers */,
 				257FF0C2126F441700424BC0 /* RestKit.h in Copy Headers */,
 			);
 			name = "Copy Headers";
@@ -716,6 +720,8 @@
 		73FE56C4126CB91600E0F30B /* RKURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKURL.h; sourceTree = "<group>"; };
 		73FE56C5126CB91600E0F30B /* RKURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKURL.m; sourceTree = "<group>"; };
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		B303A8231AC19BD3004A4782 /* NSURL+RKAdditions.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURL+RKAdditions.h"; sourceTree = "<group>"; };
+		B303A8241AC19BD3004A4782 /* NSURL+RKAdditions.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURL+RKAdditions.m"; sourceTree = "<group>"; };
 		B3B45B64175C7DF10071CEA1 /* RKCoreData.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKCoreData.h; sourceTree = "<group>"; };
 		B3F09E89147FC10F0046CDCC /* SBJSON.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SBJSON.h; sourceTree = "<group>"; };
 		B3F09E8A147FC10F0046CDCC /* SBJSON.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SBJSON.m; sourceTree = "<group>"; };
@@ -1027,6 +1033,8 @@
 				253A089C12551D8D00976E89 /* RKSearchEngine.h */,
 				253A089D12551D8D00976E89 /* RKSearchEngine.m */,
 				253A09F512552BDC00976E89 /* Support.h */,
+				B303A8231AC19BD3004A4782 /* NSURL+RKAdditions.h */,
+				B303A8241AC19BD3004A4782 /* NSURL+RKAdditions.m */,
 			);
 			path = Support;
 			sourceTree = "<group>";

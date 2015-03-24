@@ -320,6 +320,8 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 			comparisonSelector = @selector(isEqualToArray:);
 		} else if ([propertyValue isKindOfClass:[NSDictionary class]]) {
 			comparisonSelector = @selector(isEqualToDictionary:);
+		} else if ([propertyValue isKindOfClass:[NSURL class]]) {
+			comparisonSelector = @selector(isEqualToUrl:);
 		} else {
 			[NSException raise:@"NoComparisonSelectorFound" format:@"You need a comparison selector for %@ (%@)", propertyName, [propertyValue class]];
 		}
@@ -398,6 +400,8 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 						
 						propertyValue = [self parseDateFromString:propertyValue];
 					}
+					else if([class isEqual:[NSURL class]] && propertyValue)
+						propertyValue = [NSURL URLWithString:propertyValue];
 				}
 			}
 			else if([propertyValue isKindOfClass:[NSString class]])
