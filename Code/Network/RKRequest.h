@@ -12,6 +12,8 @@
 #import "RKJSONSerialization.h"
 #import <CoreGraphics/CGBase.h>
 
+@class RKClient;
+
 /**
  * HTTP methods for requests
  */
@@ -54,6 +56,7 @@ typedef void (^RKRequestProgressHandler)(RKRequest* request, NSInteger totalByte
 @property (nonatomic, copy) RKRequestProgressHandler progressHandler;
 @property (nonatomic, assign) id<RKRequestHeaderReceiver> headersReceiver;
 @property (nonatomic, retain) NSString* resourseUrl;
+@property (nonatomic, assign) RKClient* client;
 
 /**
  * The URL this request is loading
@@ -121,7 +124,7 @@ typedef void (^RKRequestProgressHandler)(RKRequest* request, NSInteger totalByte
 /**
  * Return a REST request that is ready for dispatching
  */
-+ (RKRequest*)requestWithURL:(NSURL*)URL delegate:(id)delegate;
++ (RKRequest*)requestWithURL:(NSURL*)URL delegate:(id)delegate client:(RKClient*)client;
 
 /**
  * Initialize a synchronous request
@@ -131,7 +134,7 @@ typedef void (^RKRequestProgressHandler)(RKRequest* request, NSInteger totalByte
 /**
  * Initialize a REST request and prepare it for dispatching
  */
-- (id)initWithURL:(NSURL*)URL delegate:(id)delegate;
+- (id)initWithURL:(NSURL*)URL delegate:(id)delegate client:(RKClient*)client;
 
 /**
  * Send the request asynchronously. It will be added to the queue and

@@ -27,11 +27,18 @@ static RKObjectManager* sharedManager = nil;
 @synthesize format = _format;
 @synthesize router = _router;
 
+- (void)setBodyType:(RKBodyType)bodyType
+{
+	_bodyType = bodyType;
+	self.client.bodyType = bodyType;
+}
+
 - (id)initWithBaseURL:(NSString*)baseURL {
 	if (self = [super init]) {
 		_mapper = [[RKObjectMapper alloc] init];
 		_router = [[RKDynamicRouter alloc] init];
 		_client = [[RKClient clientWithBaseURL:baseURL] retain];
+		_client.bodyType = self.bodyType;
 		self.format = RKMappingFormatJSON;
 		_onlineState = RKObjectManagerOnlineStateUndetermined;
 		[[NSNotificationCenter defaultCenter] addObserver:self

@@ -56,54 +56,59 @@ static NSString *urlEncode(id object) {
 	return result;
 }
 
-- (NSString*)URLEncodedString
+- (NSString*)URLEncodedString:(RKBodyType)bodyType
 {
-	NSMutableArray* result = [NSMutableArray array];
-	
-	for(NSString* key in self)
+	switch(bodyType)
 	{
-		id obj = [self objectForKey:key];
-		if([obj isKindOfClass:[NSDictionary class]] || [obj isKindOfClass:[NSArray class]])
-			[result addObject:[NSString stringWithFormat:@"%@=%@", key, [obj JSONRepresentation]]];
-		else
-			[result addObject:[NSString stringWithFormat:@"%@=%@", key, obj]];
-	}
-	
-	return [result componentsJoinedByString:@"&"];
-}
+		case RKBodyJson:
+		{
+			NSMutableArray* result = [NSMutableArray array];
+			
+			for(NSString* key in self)
+			{
+				id obj = [self objectForKey:key];
+				if([obj isKindOfClass:[NSDictionary class]] || [obj isKindOfClass:[NSArray class]])
+					[result addObject:[NSString stringWithFormat:@"%@=%@", key, [obj JSONRepresentation]]];
+				else
+					[result addObject:[NSString stringWithFormat:@"%@=%@", key, obj]];
+			}
+			
+			return [result componentsJoinedByString:@"&"];	
+		}
+		case RKBodyLevels:
+		{
+			NSMutableArray *parts = [NSMutableArray array];
+			for (id key in self)
+			{
+				id value = [self objectForKey:key];
+				if ([value isKindOfClass:[NSArray class]])
+				{
+					for (id item in value)
+					{
+						NSString *part = [NSString stringWithFormat: @"%@[]=%@",
+										  urlEncode(key), urlEncode(item)];
+						[parts addObject:part];
+					}
+				}
+				else
+				{
+					NSString *part = [NSString stringWithFormat: @"%@=%@",
+									  urlEncode(key), urlEncode(value)];
+					[parts addObject:part];
+				}
+			}
 
-//- (NSString*)URLEncodedString
-//{
-//	NSMutableArray *parts = [NSMutableArray array];
-//	for (id key in self)
-//	{
-//		id value = [self objectForKey:key];
-//		if ([value isKindOfClass:[NSArray class]])
-//		{
-//			for (id item in value)
-//			{
-//				NSString *part = [NSString stringWithFormat: @"%@[]=%@",
-//								  urlEncode(key), urlEncode(item)];
-//				[parts addObject:part];
-//			}
-//		}
-//		else
-//		{
-//			NSString *part = [NSString stringWithFormat: @"%@=%@",
-//							  urlEncode(key), urlEncode(value)];
-//			[parts addObject:part];
-//		}
-//	}
-//
-//	return [parts componentsJoinedByString: @"&"];
-//}
+			return [parts componentsJoinedByString: @"&"];
+		}
+	}
+}
 
 - (NSString*)HTTPHeaderValueForContentType {
 	return @"application/x-www-form-urlencoded";
 }
 
-- (NSData*)HTTPBody {
-	return [[self URLEncodedString] dataUsingEncoding:NSUTF8StringEncoding];
+- (NSData*)HTTPBody:(RKBodyType)bodyType {
+	return [[self URLEncodedString:bodyType] dataUsingEncoding:NSUTF8StringEncoding];
 }
 
 @end

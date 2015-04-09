@@ -21,8 +21,8 @@
 @synthesize URL = _URL, URLRequest = _URLRequest, delegate = _delegate, additionalHTTPHeaders = _additionalHTTPHeaders,
 			params = _params, userData = _userData, username = _username, password = _password, method = _method, logRequest, successHandler, failHandler, headersReceiver;
 
-+ (RKRequest*)requestWithURL:(NSURL*)URL delegate:(id)delegate {
-	return [[[RKRequest alloc] initWithURL:URL delegate:delegate] autorelease];
++ (RKRequest*)requestWithURL:(NSURL*)URL delegate:(id)delegate client:(RKClient*)client {
+	return [[[RKRequest alloc] initWithURL:URL delegate:delegate client:client] autorelease];
 }
 
 - (id)initWithURL:(NSURL*)URL {
@@ -40,9 +40,10 @@
 	return self;
 }
 
-- (id)initWithURL:(NSURL*)URL delegate:(id)delegate {
+- (id)initWithURL:(NSURL*)URL delegate:(id)delegate client:(RKClient*)client {
 	if (self = [self initWithURL:URL]) {
 		_delegate = delegate;
+		self.client = client;
 	}
 	return self;
 }
@@ -80,7 +81,7 @@
 		if ([_params respondsToSelector:@selector(HTTPBodyStream)]) {
 			[_URLRequest setHTTPBodyStream:[_params HTTPBodyStream]];
 		} else {
-			[_URLRequest setHTTPBody:[_params HTTPBody]];
+			[_URLRequest setHTTPBody:[_params HTTPBody:self.client.bodyType]];
 		}
 	}
 }

@@ -34,6 +34,8 @@ typedef enum {
 	RKObjectManagerOnlineState _onlineState;
 }
 
+@property (nonatomic, assign) RKBodyType bodyType;
+
 /**
  * Return the shared instance of the object manager
  */

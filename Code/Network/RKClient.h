@@ -64,6 +64,8 @@ NSString* RKMakePathWithObject(NSString* path, id object);
 	BOOL _serviceUnavailableAlertEnabled;
 }
 
+@property (nonatomic, assign) RKBodyType bodyType;
+
 @property (nonatomic, assign) id<RKRequestHeaderReceiver> headersReseiver;
 
 /**

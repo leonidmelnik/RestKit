@@ -14,6 +14,6 @@
 /**
  * Returns a representation of the dictionary as a URLEncoded string
  */
-- (NSString*)URLEncodedString;
+- (NSString*)URLEncodedString:(RKBodyType)bodyType;
 
 @end

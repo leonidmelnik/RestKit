@@ -6,6 +6,15 @@
 //  Copyright 2009 Two Toasters. All rights reserved.
 //
 
+/**
+ Determines request body type on second level and higher
+ */
+typedef enum
+{
+	RKBodyJson,		// array=["element1", "element2"]
+	RKBodyLevels	// array[0]="element1"&array[1]="element2"]
+}RKBodyType;
+
 /*
  * This protocol is implemented by objects that can be serialized into a representation suitable
  * for transmission over a REST request. Suitable serializations are x-www-form-urlencoded and
@@ -30,7 +39,7 @@
 /**
  * An NSData representing the HTTP Body serialization of the object implementing the protocol
  */
-- (NSData*)HTTPBody;
+- (NSData*)HTTPBody:(RKBodyType)bodyType;
 
 /**
  * Returns an input stream for reading the serialization as a stream. Used to provide support for
