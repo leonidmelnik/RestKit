@@ -330,7 +330,9 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 		// Original code courtesy of Greg Parker
 		// This is necessary because isEqualToNumber will return negative integer values that aren't coercable directly to BOOL's without help [sbw]
 		BOOL (*ComparisonSender)(id, SEL, id) = (BOOL (*)(id, SEL, id)) objc_msgSend;		
-		BOOL areEqual = ComparisonSender(currentValue, comparisonSelector, propertyValue);
+		BOOL areEqual = NO;
+		if([currentValue respondsToSelector:comparisonSelector] && [propertyName respondsToSelector:comparisonSelector])
+			areEqual = ComparisonSender(currentValue, comparisonSelector, propertyValue);
 		
 		if (NO == areEqual) {
 			[model setValue:propertyValue forKeyPath:propertyName];
