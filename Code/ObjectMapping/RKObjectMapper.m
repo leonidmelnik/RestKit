@@ -360,6 +360,22 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 	return result;
 }
 
+- (id)convertValue:(id)value forClass:(Class)class
+{
+	id result = value;
+	if ([class isEqual:[NSDate class]])
+	{
+		// seems is bug: when date in ISO 8601 then we don't need convert time to local time zone, because time have +0000
+//		NSDate* date = [self parseDateFromString:(propertyValue)];
+//		propertyValue = [self dateInLocalTime:date];
+		
+		result = [self parseDateFromString:value];
+	}
+	else if([class isEqual:[NSURL class]] && value)
+		result = [NSURL URLWithString:value];
+	return result;
+}
+
 - (void)setPropertiesOfModel:(id)model fromElements:(NSDictionary*)elements
 {
 	NSDictionary* elementToPropertyMappings = [self elementToPropertyMappingsForModel:model];
@@ -393,18 +409,7 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 			{
 				Class class = [dic objectForKey:@"class"];
 				if (elementValue != (id)kCFNull && nil != elementValue)
-				{
-					if ([class isEqual:[NSDate class]])
-					{
-						// seems is bug: when date in ISO 8601 then we don't need convert time to local time zone, because time have +0000
-//						NSDate* date = [self parseDateFromString:(propertyValue)];
-//						propertyValue = [self dateInLocalTime:date];
-						
-						propertyValue = [self parseDateFromString:propertyValue];
-					}
-					else if([class isEqual:[NSURL class]] && propertyValue)
-						propertyValue = [NSURL URLWithString:propertyValue];
-				}
+					propertyValue = [self convertValue:propertyValue forClass:class];
 			}
 			else if([propertyValue isKindOfClass:[NSString class]])
 			{
@@ -496,8 +501,12 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 					children = [NSMutableArray arrayWithCapacity:[relationshipElements count]];
 				}
 				
-				for (NSDictionary* childElements in relationshipElements) {				
-					id child = [self createOrUpdateInstanceOfModelClass:class fromElements:childElements];		
+				for (id childElements in relationshipElements) {	
+					id child = nil;	
+					if([class conformsToProtocol:@protocol(RKObjectMappable)] && [childElements isKindOfClass:[NSDictionary class]])
+						child = [self createOrUpdateInstanceOfModelClass:class fromElements:childElements];
+					else
+						child = [self convertValue:childElements forClass:class];
 					if (child) {
 						[(NSMutableArray*)children addObject:child];
 					}
