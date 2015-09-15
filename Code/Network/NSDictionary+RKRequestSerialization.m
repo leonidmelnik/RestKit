@@ -7,7 +7,7 @@
 //
 
 #import "NSDictionary+RKRequestSerialization.h"
-#import <RestKit/JSONParser+SBJSON/JSON.h>
+
 
 // private helper function to convert any object to its string representation
 static NSString *toString(id object) {
@@ -68,7 +68,11 @@ static NSString *urlEncode(id object) {
 			{
 				id obj = [self objectForKey:key];
 				if([obj isKindOfClass:[NSDictionary class]] || [obj isKindOfClass:[NSArray class]])
-					[result addObject:[NSString stringWithFormat:@"%@=%@", key, [obj JSONRepresentation]]];
+				{
+					NSData* jsonData = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];
+					NSString* jsonString = [[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] autorelease];
+					[result addObject:[NSString stringWithFormat:@"%@=%@", key, jsonString]];
+				}
 				else
 					[result addObject:[NSString stringWithFormat:@"%@=%@", key, obj]];
 			}
