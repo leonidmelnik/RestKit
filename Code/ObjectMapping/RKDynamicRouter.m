@@ -34,7 +34,7 @@
 	
 	NSMutableDictionary* classRoutes = [_routes objectForKey:className];
 	if ([classRoutes objectForKey:methodName]) {
-		[NSException raise:nil format:@"A route has already been registered for class '%@' and HTTP method '%@'", className, methodName];
+		[NSException raise:@"routeClass" format:@"A route has already been registered for class '%@' and HTTP method '%@'", className, methodName];
 	}
 	
 	[classRoutes setValue:resourcePath forKey:methodName];
@@ -88,7 +88,7 @@
 		return RKMakePathWithObject(resourcePath, object);
 	}
 	
-	[NSException raise:nil format:@"Unable to find a routable path for object of type '%@' for HTTP Method '%@'", className, methodName];
+	[NSException raise:@"resourcePathForObject" format:@"Unable to find a routable path for object of type '%@' for HTTP Method '%@'", className, methodName];
 	
 	return nil;
 }

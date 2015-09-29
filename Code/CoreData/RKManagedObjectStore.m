@@ -58,6 +58,7 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
 		[[self managedObjectContext] save:&error];
 	}
 	@catch (NSException* e) {
+#if !TARGET_OS_WATCH
 		// TODO: This needs to be reworked into a delegation pattern
 		NSString* errorMessage = [NSString stringWithFormat:@"An unrecoverable error was encountered while trying to save the database: %@", [e reason]];
 		UIAlertView* alert = [[UIAlertView alloc] initWithTitle:NSLocalizedString(@"Ruh roh.", nil) 
@@ -67,6 +68,7 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
 											  otherButtonTitles:nil];
 		[alert show];
 		[alert release];
+#endif
 	} 
 	@finally {
 		if (error) {
@@ -78,7 +80,11 @@ static NSString* const kRKManagedObjectContextKey = @"RKManagedObjectContext";
 }
 
 - (NSManagedObjectContext*)newManagedObjectContext {
+#if TARGET_OS_WATCH
+	NSManagedObjectContext* managedObjectContext = [[NSManagedObjectContext alloc] initWithConcurrencyType:NSPrivateQueueConcurrencyType];
+#else
 	NSManagedObjectContext* managedObjectContext = [[NSManagedObjectContext alloc] init];
+#endif
 	[managedObjectContext setPersistentStoreCoordinator:self.persistentStoreCoordinator];
 	[managedObjectContext setUndoManager:nil];
 	[managedObjectContext setMergePolicy:NSOverwriteMergePolicy];

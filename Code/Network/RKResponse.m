@@ -83,6 +83,15 @@
 //	}
 //}
 
+- (NSInputStream *)connection:(NSURLConnection *)connection needNewBodyStream:(NSURLRequest *)request
+{
+	NSLog(@"NEED NEW BODY STREAM: %@ (%@)", request.URL.absoluteString, NSStringFromClass([request.HTTPBodyStream class]));
+	if([request.HTTPBodyStream conformsToProtocol:@protocol(NSCopying)])
+		return [request.HTTPBodyStream copy];
+	
+	return nil;
+}
+
 - (void)dispatchRequestDidStartLoadIfNecessary {
 	if (NO == _loading) {
 		_loading = YES;
@@ -119,7 +128,9 @@
 - (void)connection:(NSURLConnection *)connection didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite {
 	[self dispatchRequestDidStartLoadIfNecessary];
 	
-	[_request request:_request didSendBodyData:bytesWritten totalBytesWritten:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
+	if ([[_request delegate] respondsToSelector:@selector(request:didSendBodyData:totalBytesWritten:totalBytesExpectedToWrite:)]) {
+		[[_request delegate] request:_request didSendBodyData:bytesWritten totalBytesWritten:totalBytesWritten totalBytesExpectedToWrite:totalBytesExpectedToWrite];
+	}
 }
 
 - (NSString*)localizedStatusCodeString {

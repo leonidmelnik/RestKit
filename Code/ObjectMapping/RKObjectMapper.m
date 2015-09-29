@@ -36,8 +36,9 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 - (void)updateModel:(id)model ifNewPropertyValue:(id)propertyValue forPropertyNamed:(NSString*)propertyName; // Rename!
 - (void)setPropertiesOfModel:(id)model fromElements:(NSDictionary*)elements;
 - (void)setRelationshipsOfModel:(id)object fromElements:(NSDictionary*)elements;
+- (void)updateModel:(id)model fromElements:(NSDictionary*)elements;
 
-
+- (NSDate*)parseDateFromString:(NSString*)string;
 - (NSDate*)dateInLocalTime:(NSDate*)date;
 
 @end

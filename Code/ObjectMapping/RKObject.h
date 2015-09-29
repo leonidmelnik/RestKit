@@ -13,7 +13,7 @@
 /**
  * Base class for non-managed RestKit mappable objects.
  */
-@interface RKObject : NSObject <RKObjectMappable, NSCoding> {
+@interface RKObject : NSObject <RKObjectMappable, NSCoding, NSCopying> {
 
 }
 

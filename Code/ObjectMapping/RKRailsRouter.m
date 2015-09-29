@@ -41,7 +41,7 @@
 	NSString* modelName = [_classToModelMappings objectForKey:[object class]];
 	if (nil == modelName) {
 		NSString* className = NSStringFromClass([object class]);
-		[NSException raise:nil format:@"Unable to find registered modelName for class '%@'", className];
+		[NSException raise:@"serializationForObject" format:@"Unable to find registered modelName for class '%@'", className];
 	}
 	
 	NSString* underscoredModelName = [modelName underscore];

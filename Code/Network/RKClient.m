@@ -9,7 +9,6 @@
 #import "RKClient.h"
 #import "RKObjectLoader.h"
 #import "RKURL.h"
-#import <SystemConfiguration/SCNetworkReachability.h>
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 // Global
@@ -206,7 +205,7 @@ NSString* RKMakePathWithObject(NSString* path, id object) {
 
 - (RKRequest*)load:(NSString*)resourcePath method:(RKRequestMethod)method params:(NSObject<RKRequestSerializable>*)params delegate:(id)delegate
 {
-	return [self load:resourcePath method:method params:params delegate:delegate shouldLog:YES];
+	return [self load:resourcePath method:method params:params delegate:delegate shouldLog:self.logRequests];
 }
 
 - (RKRequest*)load:(NSString*)resourcePath method:(RKRequestMethod)method params:(NSObject<RKRequestSerializable>*)params delegate:(id)delegate shouldLog:(BOOL)shouldLog
@@ -269,12 +268,12 @@ NSString* RKMakePathWithObject(NSString* path, id object) {
 	return result;
 }
 
-- (RKRequest*)delete:(NSString*)resourcePath delegate:(id)delegate {
-	return [self load:resourcePath method:RKRequestMethodDELETE params:nil delegate:delegate];
+- (RKRequest*)delete:(NSString*)resourcePath params:(NSObject<RKRequestSerializable>*)params delegate:(id)delegate {
+	return [self load:resourcePath method:RKRequestMethodDELETE params:params delegate:delegate];
 }
-- (RKRequest*)delete:(NSString *)resourcePath successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail
+- (RKRequest*)delete:(NSString *)resourcePath params:(NSObject<RKRequestSerializable>*)params successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail
 {
-	RKRequest* result = [self load:resourcePath method:RKRequestMethodDELETE params:nil delegate:nil];
+	RKRequest* result = [self load:resourcePath method:RKRequestMethodDELETE params:params delegate:nil];
 	result.successHandler = success;
 	result.failHandler = fail;
 	return result;

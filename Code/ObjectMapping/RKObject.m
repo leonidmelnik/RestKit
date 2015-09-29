@@ -106,6 +106,39 @@
 }
 
 #pragma mark -
+#pragma mark NSCopying
+
+- (id)copyWithZone:(NSZone *)zone
+{
+	RKObject* result = [[[self class] allocWithZone:zone] init];
+	
+	NSMutableDictionary* dic = [NSMutableDictionary dictionaryWithDictionary:[[self class] elementToPropertyMappings]];
+	
+	for(NSString* key in [dic allKeys])
+	{
+		NSString* _key = [dic objectForKey:key];
+		if([_key length] && [[self valueForKey:_key] conformsToProtocol:@protocol(NSCopying)])
+			[result setValue:[[[self valueForKey:_key] copy] autorelease] forKey:_key];
+	}
+	
+	if([[self class] respondsToSelector:@selector(elementToRelationshipMappings)])
+	{
+		NSArray* allKeys = [[[self class] elementToRelationshipMappings] allKeys];
+		for(NSString* key in allKeys)
+		{
+			if([key length])
+			{
+				NSString* _key = [[[self class] elementToRelationshipMappings] objectForKey:key];
+				if([_key length] && [[self valueForKey:_key] conformsToProtocol:@protocol(NSCopying)])
+					[result setValue:[[[self valueForKey:_key] copy] autorelease] forKey:_key];
+			}
+		}
+	}
+	
+	return result;
+}
+
+#pragma mark -
 #pragma mark Methods
 
 + (id)objectFromResponse:(RKResponse*)response

@@ -14,6 +14,7 @@
 // Constants
 NSString* const RKReachabilityStateChangedNotification = @"RKReachabilityStateChangedNotification";
 
+#if !TARGET_OS_WATCH
 static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReachabilityFlags flags, void* info) {
 #pragma unused (target, flags)
 	// We're on the main RunLoop, so an NSAutoreleasePool is not necessary, but is added defensively
@@ -29,19 +30,82 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 	
 	[pool release];
 }
+#endif
 
 #pragma mark -
 
 @interface RKReachabilityObserver (Private)
 
 // Internal initializer
+#if !TARGET_OS_WATCH
 - (id)initWithReachabilityRef:(SCNetworkReachabilityRef)reachabilityRef;
+#endif
 - (void)scheduleObserver;
 - (void)unscheduleObserver;
 
 @end
 
 @implementation RKReachabilityObserver
+
+#pragma mark Watch
+
+#if TARGET_OS_WATCH
++ (RKReachabilityObserver*)reachabilityObserverWithHostName:(NSString*)hostName {
+	RKReachabilityObserver* observer = nil;
+	
+	// Try to determine if we have an IP address or a hostname
+	struct sockaddr_in sa;
+	char* hostNameOrIPAddress = (char*) [hostName UTF8String];
+	int result = inet_pton(AF_INET, hostNameOrIPAddress, &(sa.sin_addr));
+	
+	BOOL netIsDetermined = NO;
+	
+	if (result != 0) {
+		// IP Address
+		struct sockaddr_in remote_saddr;
+		
+		bzero(&remote_saddr, sizeof(struct sockaddr_in));
+		remote_saddr.sin_len = sizeof(struct sockaddr_in);
+		remote_saddr.sin_family = AF_INET;
+		inet_aton(hostNameOrIPAddress, &(remote_saddr.sin_addr));
+		
+		// We can immediately determine reachability to an IP address
+		netIsDetermined = YES;
+	}
+	
+	return observer;
+}
+
+- (void)dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver:self];
+	[self unscheduleObserver];
+	self.hostName = nil;
+	[super dealloc];
+}
+
+- (RKReachabilityNetworkStatus)networkStatus {
+	return RKReachabilityReachableViaWiFi;	
+}
+
+- (BOOL)isNetworkReachable {
+	return YES;
+}
+
+- (BOOL)isConnectionRequired {
+	return NO;
+}
+
+#pragma mark Observer scheduling
+
+- (void)scheduleObserver {
+	
+}
+
+- (void)unscheduleObserver {
+	
+}
+
+#else
 
 + (RKReachabilityObserver*)reachabilityObserverWithHostName:(NSString*)hostName {
 	RKReachabilityObserver* observer = nil;
@@ -179,5 +243,7 @@ static void ReachabilityCallback(SCNetworkReachabilityRef target, SCNetworkReach
 		SCNetworkReachabilityUnscheduleFromRunLoop(_reachabilityRef, CFRunLoopGetCurrent(), kCFRunLoopDefaultMode);
 	}
 }
+
+#endif
 
 @end

@@ -7,7 +7,9 @@
 //
 
 #import <Foundation/Foundation.h>
+#if !TARGET_OS_WATCH
 #import <SystemConfiguration/SystemConfiguration.h>
+#endif
 
 /**
  * Posted when the network state has changed
@@ -26,7 +28,9 @@ typedef enum {
  * to network status
  */
 @interface RKReachabilityObserver : NSObject {
+#if !TARGET_OS_WATCH
 	SCNetworkReachabilityRef _reachabilityRef;	
+#endif
 }
 
 @property (nonatomic, copy) NSString* hostName;

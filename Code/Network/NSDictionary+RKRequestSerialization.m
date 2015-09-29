@@ -8,7 +8,6 @@
 
 #import "NSDictionary+RKRequestSerialization.h"
 
-
 // private helper function to convert any object to its string representation
 static NSString *toString(id object) {
 	return [NSString stringWithFormat: @"%@", object];
@@ -17,12 +16,16 @@ static NSString *toString(id object) {
 // private helper function to convert string to UTF-8 and URL encode it
 static NSString *urlEncode(id object) {
 	NSString *string = toString(object);
-	NSString *encodedString = (NSString*)CFURLCreateStringByAddingPercentEscapes(NULL,
-																				 (CFStringRef)string,
-																				 NULL,
-																				 (CFStringRef)@"!*'();:@&=+$,/?%#[]",
-																				 kCFStringEncodingUTF8);
-	return [encodedString autorelease];
+#if TARGET_OS_WATCH
+	NSString *encodedString = [string stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]];
+#else
+	NSString *encodedString = [((NSString*)CFURLCreateStringByAddingPercentEscapes(NULL,
+																				   (CFStringRef)string,
+																				   NULL,
+																				   (CFStringRef)@"!*'();:@&=+$,/?%#[]",
+																				   kCFStringEncodingUTF8)) autorelease];
+#endif
+	return encodedString;
 }
 
 
@@ -101,7 +104,7 @@ static NSString *urlEncode(id object) {
 					[parts addObject:part];
 				}
 			}
-
+			
 			return [parts componentsJoinedByString: @"&"];
 		}
 	}

@@ -116,7 +116,7 @@
 			if ([_delegate respondsToSelector:@selector(objectLoaderDidLoadUnexpectedResponse:)]) {
 				[(NSObject<RKObjectLoaderDelegate>*)_delegate objectLoaderDidLoadUnexpectedResponse:self];
 			}
-
+#if !TARGET_OS_WATCH
 			UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[_client serviceUnavailableAlertTitle]
 																message:[_client serviceUnavailableAlertMessage]
 															   delegate:nil
@@ -124,6 +124,7 @@
 													  otherButtonTitles:nil];
 			[alertView show];
 			[alertView release];
+#endif
 
 		} else {
 			// TODO: We've likely run into a maintenance page here.  Consider adding the ability
@@ -307,11 +308,6 @@
 - (void)send {
 	[self handleTargetObject];
 	[super send];
-}
-
-- (RKResponse*)sendSynchronously {
-	[self handleTargetObject];
-	return [super sendSynchronously];
 }
 
 @end

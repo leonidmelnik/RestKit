@@ -10,7 +10,6 @@
 #import <CoreData/CoreData.h>
 #import "RKRequestSerializable.h"
 #import "RKJSONSerialization.h"
-#import <CoreGraphics/CGBase.h>
 
 @class RKClient;
 
@@ -141,11 +140,6 @@ typedef void (^RKRequestProgressHandler)(RKRequest* request, NSInteger totalByte
  * dispatched as soon as possible.
  */
 - (void)send;
-
-/**
- * Send the request synchronously and return a hydrated response object
- */
-- (RKResponse*)sendSynchronously;
 
 /**
  * Callback performed to notify the request that the underlying NSURLConnection

@@ -115,6 +115,8 @@ NSString* RKMakePathWithObject(NSString* path, id object);
  */
 @property(nonatomic, assign) BOOL serviceUnavailableAlertEnabled;
 
+@property(nonatomic, assign) BOOL logRequests;
+
 /**
  * Return the configured singleton instance of the Rest client
  */
@@ -228,7 +230,7 @@ NSString* RKMakePathWithObject(NSString* path, id object);
 /**
  * Destroy a resource via an HTTP DELETE
  */
-- (RKRequest*)delete:(NSString*)resourcePath delegate:(NSObject<RKRequestDelegate>*)delegate;
-- (RKRequest*)delete:(NSString*)resourcePath successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail;
+- (RKRequest*)delete:(NSString*)resourcePath params:(NSObject<RKRequestSerializable>*)params delegate:(NSObject<RKRequestDelegate>*)delegate;
+- (RKRequest*)delete:(NSString*)resourcePath params:(NSObject<RKRequestSerializable>*)params successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail;
 
 @end

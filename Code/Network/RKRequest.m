@@ -103,7 +103,8 @@
 			[_URLRequest setValue:[NSString stringWithFormat:@"%lu", (unsigned long)[_params HTTPHeaderValueForContentLength]] forHTTPHeaderField:@"Content-Length"];
 		}
 	}
-
+	
+#if !TARGET_OS_WATCH
 	if (_username != nil) {
 		// Add authentication headers so we don't have to deal with an extra cycle for each message requiring basic auth.
 		CFHTTPMessageRef dummyRequest = CFHTTPMessageCreateRequest(kCFAllocatorDefault, (CFStringRef)[self HTTPMethod], (CFURLRef)[self URL], kCFHTTPVersion1_1);
@@ -115,6 +116,7 @@
 		CFRelease(dummyRequest);
 		CFRelease(authorizationString);
 	}
+#endif
 //	if(logRequest)
 //		NSLog(@"Headers: %@", [_URLRequest allHTTPHeaderFields]);
 }
@@ -155,17 +157,23 @@
 		[self prepareURLRequest];
 		NSString* body = [[NSString alloc] initWithData:[_URLRequest HTTPBody] encoding:NSUTF8StringEncoding];
 		if(logRequest)
-			NSLog(@"Sending %@ request to URL %@. HTTP Body: %@", [self HTTPMethod], [[self URL] absoluteString], body);
+			NSLog(@"Sending %@ request to URL %@. HTTP Body: %@", [self HTTPMethod], [[[self URLRequest] URL] absoluteString], body);
 		[body release];
 		NSDate* sentAt = [NSDate date];
 		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self HTTPMethod], @"HTTPMethod", [self URL], @"URL", sentAt, @"sentAt", nil];
 		[[NSNotificationCenter defaultCenter] postNotificationName:kRKRequestSentNotification object:self userInfo:userInfo];
 
 		_isLoading = YES;
-		RKResponse* response = [[[RKResponse alloc] initWithRequest:self] autorelease];
-		_connection = [[NSURLConnection alloc] initWithRequest:_URLRequest delegate:response startImmediately:NO];
-		[_connection scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
-		[_connection start];
+		NSURLSessionTask *task = [[NSURLSession sharedSession] dataTaskWithRequest:_URLRequest completionHandler:^(NSData * _Nullable data, NSURLResponse * _Nullable response_, NSError * _Nullable error_) {
+			
+			RKResponse* response = [[[RKResponse alloc] initWithSynchronousRequest:self URLResponse:response_ body:data error:error_] autorelease];
+			
+			dispatch_async(dispatch_get_main_queue(), ^{
+				[self didFinishLoad:response];
+			});
+			
+		}];
+		[task resume];
 	} else {
 		NSString* errorMessage = [NSString stringWithFormat:@"The client is unable to contact the resource at %@", [[self URL] absoluteString]];
 		NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -175,42 +183,6 @@
 		[self performSelector:@selector(didFailLoadWithError:) withObject:error afterDelay:0.01];
 		_isLoaded = YES;
 	}
-}
-
-- (RKResponse*)sendSynchronously {
-	NSURLResponse* URLResponse = nil;
-	NSError* error = nil;
-	NSData* payload = nil;
-	RKResponse* response = nil;
-
-	if ([[RKClient sharedClient] isNetworkAvailable]) {
-		[self prepareURLRequest];
-		if(logRequest)
-		{
-			NSString* body = [[NSString alloc] initWithData:[_URLRequest HTTPBody] encoding:NSUTF8StringEncoding];
-			NSLog(@"Sending synchronous %@ request to URL %@. HTTP Body: %@", [self HTTPMethod], [[self URL] absoluteString], body);
-			[body release];
-		}
-		NSDate* sentAt = [NSDate date];
-		NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self HTTPMethod], @"HTTPMethod", [self URL], @"URL", sentAt, @"sentAt", nil];
-		[[NSNotificationCenter defaultCenter] postNotificationName:kRKRequestSentNotification object:self userInfo:userInfo];
-
-		_isLoading = YES;
-		payload = [NSURLConnection sendSynchronousRequest:_URLRequest returningResponse:&URLResponse error:&error];
-		response = [[[RKResponse alloc] initWithSynchronousRequest:self URLResponse:URLResponse body:payload error:error] autorelease];
-	} else {
-		NSString* errorMessage = [NSString stringWithFormat:@"The client is unable to contact the resource at %@", [[self URL] absoluteString]];
-		NSDictionary *userInfo = [NSDictionary dictionaryWithObjectsAndKeys:
-								  errorMessage, NSLocalizedDescriptionKey,
-								  nil];
-		error = [NSError errorWithDomain:RKRestKitErrorDomain code:RKRequestBaseURLOfflineError userInfo:userInfo];
-		[self didFailLoadWithError:error];
-
-		// TODO: Is this needed here?  Or can we just return a nil response and everyone will be happy??
-		response = [[[RKResponse alloc] initWithSynchronousRequest:self URLResponse:URLResponse body:payload error:error] autorelease];
-	}
-
-	return response;
 }
 
 - (void)cancel {
@@ -260,6 +232,7 @@
 	NSDictionary* userInfo = [NSDictionary dictionaryWithObjectsAndKeys:[self HTTPMethod], @"HTTPMethod", [self URL], @"URL", receivedAt, @"receivedAt", nil];
 	[[NSNotificationCenter defaultCenter] postNotificationName:kRKResponseReceivedNotification object:response userInfo:userInfo];
 
+#if !TARGET_OS_WATCH
 	if ([response isServiceUnavailable] && [[RKClient sharedClient] serviceUnavailableAlertEnabled]) {
 		UIAlertView* alertView = [[UIAlertView alloc] initWithTitle:[[RKClient sharedClient] serviceUnavailableAlertTitle]
 															message:[[RKClient sharedClient] serviceUnavailableAlertMessage]
@@ -268,8 +241,8 @@
 												  otherButtonTitles:nil];
 		[alertView show];
 		[alertView release];
-
 	}
+#endif
 }
 
 - (void)request:(RKRequest*)request didSendBodyData:(NSInteger)bytesWritten totalBytesWritten:(NSInteger)totalBytesWritten totalBytesExpectedToWrite:(NSInteger)totalBytesExpectedToWrite
