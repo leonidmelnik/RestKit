@@ -228,14 +228,14 @@ NSString* RKMakePathWithObject(NSString* path, id object) {
 }
 
 - (RKRequest*)get:(NSString*)resourcePath queryParams:(NSDictionary*)queryParams delegate:(id)delegate {
-	NSString* resourcePathWithQueryString = [NSString stringWithFormat:@"%@?%@", resourcePath, [queryParams URLEncodedString]];
+	NSString* resourcePathWithQueryString = [NSString stringWithFormat:@"%@?%@", resourcePath, [queryParams URLEncodedString:self.bodyType]];
 	return [self load:resourcePathWithQueryString method:RKRequestMethodGET params:nil delegate:delegate];
 }
 - (RKRequest*)get:(NSString*)resourcePath queryParams:(NSDictionary*)queryParams  successHandler:(RKRequestSuccessHandler)success failHandler:(RKRequestFailHandler)fail {
 	NSString* resourcePathWithQueryString = nil;
-	NSString* URLEncodedString = [queryParams URLEncodedString];
+	NSString* URLEncodedString = [queryParams URLEncodedString:self.bodyType];
 	if(URLEncodedString)
-		resourcePathWithQueryString = [NSString stringWithFormat:@"%@?%@", resourcePath, [queryParams URLEncodedString]];
+		resourcePathWithQueryString = [NSString stringWithFormat:@"%@?%@", resourcePath, [queryParams URLEncodedString:self.bodyType]];
 	else
 		resourcePathWithQueryString = resourcePath;
 	RKRequest* request = [self load:resourcePathWithQueryString method:RKRequestMethodGET params:nil delegate:nil shouldLog:self.logRequests];
