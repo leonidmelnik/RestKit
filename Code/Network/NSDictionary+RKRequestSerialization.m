@@ -74,10 +74,10 @@ static NSString *urlEncode(id object) {
 				{
 					NSData* jsonData = [NSJSONSerialization dataWithJSONObject:obj options:0 error:nil];
 					NSString* jsonString = [[[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding] autorelease];
-					[result addObject:[NSString stringWithFormat:@"%@=%@", key, jsonString]];
+					[result addObject:[NSString stringWithFormat:@"%@=%@", urlEncode(key), urlEncode(jsonString)]];
 				}
 				else
-					[result addObject:[NSString stringWithFormat:@"%@=%@", key, obj]];
+					[result addObject:[NSString stringWithFormat:@"%@=%@", urlEncode(key), urlEncode(obj)]];
 			}
 			
 			return [result componentsJoinedByString:@"&"];	
