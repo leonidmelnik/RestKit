@@ -374,6 +374,10 @@ static const NSString* kRKModelMapperMappingFormatParserKey = @"RKMappingFormatP
 	}
 	else if([class isEqual:[NSURL class]] && value)
 		result = [NSURL URLWithString:value];
+	
+	if([result class] != class && ![[result class] isSubclassOfClass:class] && ![class isSubclassOfClass:[result class]])
+		return nil;
+	
 	return result;
 }
 
