@@ -87,7 +87,7 @@
 {
 	NSLog(@"NEED NEW BODY STREAM: %@ (%@)", request.URL.absoluteString, NSStringFromClass([request.HTTPBodyStream class]));
 	if([request.HTTPBodyStream conformsToProtocol:@protocol(NSCopying)])
-		return [request.HTTPBodyStream copy];
+		return [[request.HTTPBodyStream copy] autorelease];
 	
 	return nil;
 }
