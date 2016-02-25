@@ -84,28 +84,16 @@ static NSString *urlEncode(id object) {
 		}
 		case RKBodyLevels:
 		{
-			NSMutableArray *parts = [NSMutableArray array];
-			for (id key in self)
+			NSMutableArray* result = [NSMutableArray array];
+			
+			for(NSString* key in self)
 			{
-				id value = [self objectForKey:key];
-				if ([value isKindOfClass:[NSArray class]])
-				{
-					for (id item in value)
-					{
-						NSString *part = [NSString stringWithFormat: @"%@[]=%@",
-										  urlEncode(key), urlEncode(item)];
-						[parts addObject:part];
-					}
-				}
-				else
-				{
-					NSString *part = [NSString stringWithFormat: @"%@=%@",
-									  urlEncode(key), urlEncode(value)];
-					[parts addObject:part];
-				}
+				NSArray* additionalElements = [self URLEncodedElement:[self objectForKey:key]];
+				for(NSString* additionalEl in additionalElements)
+					[result addObject:[NSString stringWithFormat:@"%@%@", key, additionalEl]];
 			}
 			
-			return [parts componentsJoinedByString: @"&"];
+			return [result componentsJoinedByString:@"&"];
 		}
 	}
 }
