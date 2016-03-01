@@ -10,6 +10,7 @@
 #import "RKParams.h"
 #import "RKResponse.h"
 #import "NSDictionary+RKRequestSerialization.h"
+#import "NSString+RKRequestSerialization.h"
 #import "RKReachabilityObserver.h"
 
 /////////////////////////////////////////////////////////////////////////

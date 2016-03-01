@@ -200,6 +200,10 @@
 		73FE56C7126CB91600E0F30B /* RKURL.h in Headers */ = {isa = PBXBuildFile; fileRef = 73FE56C4126CB91600E0F30B /* RKURL.h */; };
 		73FE56C8126CB91600E0F30B /* RKURL.m in Sources */ = {isa = PBXBuildFile; fileRef = 73FE56C5126CB91600E0F30B /* RKURL.m */; };
 		B337C4181C71FAB1001072CC /* RestKit.h in CopyFiles */ = {isa = PBXBuildFile; fileRef = 253A089212551D8D00976E89 /* RestKit.h */; };
+		B351A7FA1C85DFEA00C244F3 /* NSString+RKRequestSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = B351A7F81C85DFEA00C244F3 /* NSString+RKRequestSerialization.h */; };
+		B351A7FB1C85DFEA00C244F3 /* NSString+RKRequestSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = B351A7F81C85DFEA00C244F3 /* NSString+RKRequestSerialization.h */; };
+		B351A7FC1C85DFEA00C244F3 /* NSString+RKRequestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = B351A7F91C85DFEA00C244F3 /* NSString+RKRequestSerialization.m */; };
+		B351A7FD1C85DFEA00C244F3 /* NSString+RKRequestSerialization.m in Sources */ = {isa = PBXBuildFile; fileRef = B351A7F91C85DFEA00C244F3 /* NSString+RKRequestSerialization.m */; };
 		B3864FA01BAFDBF0002ED49B /* RestKit.h in Copy Headers */ = {isa = PBXBuildFile; fileRef = 253A089212551D8D00976E89 /* RestKit.h */; };
 		B3864FA71BAFDBF2002ED49B /* Network.h in Headers */ = {isa = PBXBuildFile; fileRef = 253A08AE12551EA500976E89 /* Network.h */; };
 		B3864FA81BAFDBF2002ED49B /* NSDictionary+RKRequestSerialization.h in Headers */ = {isa = PBXBuildFile; fileRef = 253A086612551D8D00976E89 /* NSDictionary+RKRequestSerialization.h */; };
@@ -979,6 +983,8 @@
 		73FE56C4126CB91600E0F30B /* RKURL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RKURL.h; sourceTree = "<group>"; };
 		73FE56C5126CB91600E0F30B /* RKURL.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RKURL.m; sourceTree = "<group>"; };
 		AACBBE490F95108600F1A2B1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
+		B351A7F81C85DFEA00C244F3 /* NSString+RKRequestSerialization.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSString+RKRequestSerialization.h"; sourceTree = "<group>"; };
+		B351A7F91C85DFEA00C244F3 /* NSString+RKRequestSerialization.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSString+RKRequestSerialization.m"; sourceTree = "<group>"; };
 		B3864FD21BAFDBF2002ED49B /* libRestKitNetwork_watch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRestKitNetwork_watch.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B3864FF71BAFDBF5002ED49B /* libRestKitObjectMapping_watch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRestKitObjectMapping_watch.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		B38650141BAFDBF7002ED49B /* libRestKitSupport_watch.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libRestKitSupport_watch.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1266,6 +1272,8 @@
 				253A08AE12551EA500976E89 /* Network.h */,
 				253A086612551D8D00976E89 /* NSDictionary+RKRequestSerialization.h */,
 				253A086712551D8D00976E89 /* NSDictionary+RKRequestSerialization.m */,
+				B351A7F81C85DFEA00C244F3 /* NSString+RKRequestSerialization.h */,
+				B351A7F91C85DFEA00C244F3 /* NSString+RKRequestSerialization.m */,
 				253A086812551D8D00976E89 /* NSObject+RKJSONSerialization.m */,
 				253A086912551D8D00976E89 /* RKClient.h */,
 				253A086A12551D8D00976E89 /* RKClient.m */,
@@ -1652,6 +1660,7 @@
 				253A08DD125522E100976E89 /* RKRequest.h in Headers */,
 				253A08DF125522E300976E89 /* RKRequestSerializable.h in Headers */,
 				253A08E0125522E300976E89 /* RKResponse.h in Headers */,
+				B351A7FA1C85DFEA00C244F3 /* NSString+RKRequestSerialization.h in Headers */,
 				73C89EF212A5BB9A000FE600 /* RKReachabilityObserver.h in Headers */,
 				2538C05C12A6C44A0006903C /* RKRequestQueue.h in Headers */,
 				73FE56C7126CB91600E0F30B /* RKURL.h in Headers */,
@@ -1754,6 +1763,7 @@
 				B3864FAE1BAFDBF2002ED49B /* RKRequest.h in Headers */,
 				B3864FAF1BAFDBF2002ED49B /* RKRequestSerializable.h in Headers */,
 				B3864FB01BAFDBF2002ED49B /* RKResponse.h in Headers */,
+				B351A7FB1C85DFEA00C244F3 /* NSString+RKRequestSerialization.h in Headers */,
 				B3864FB11BAFDBF2002ED49B /* RKReachabilityObserver.h in Headers */,
 				B3864FB21BAFDBF2002ED49B /* RKRequestQueue.h in Headers */,
 				B3864FB31BAFDBF2002ED49B /* RKURL.h in Headers */,
@@ -2331,6 +2341,7 @@
 			files = (
 				253A08CD125522D000976E89 /* NSDictionary+RKRequestSerialization.m in Sources */,
 				253A08CE125522D100976E89 /* NSObject+RKJSONSerialization.m in Sources */,
+				B351A7FC1C85DFEA00C244F3 /* NSString+RKRequestSerialization.m in Sources */,
 				253A08D0125522D200976E89 /* RKClient.m in Sources */,
 				253A08D2125522D400976E89 /* RKJSONSerialization.m in Sources */,
 				253A08D4125522D500976E89 /* RKNotifications.m in Sources */,
@@ -2422,6 +2433,7 @@
 			files = (
 				B3864FC21BAFDBF2002ED49B /* NSDictionary+RKRequestSerialization.m in Sources */,
 				B3864FC31BAFDBF2002ED49B /* NSObject+RKJSONSerialization.m in Sources */,
+				B351A7FD1C85DFEA00C244F3 /* NSString+RKRequestSerialization.m in Sources */,
 				B3864FC41BAFDBF2002ED49B /* RKClient.m in Sources */,
 				B3864FC51BAFDBF2002ED49B /* RKJSONSerialization.m in Sources */,
 				B3864FC61BAFDBF2002ED49B /* RKNotifications.m in Sources */,

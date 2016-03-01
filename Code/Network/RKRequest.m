@@ -10,6 +10,7 @@
 #import "RKRequestQueue.h"
 #import "RKResponse.h"
 #import "NSDictionary+RKRequestSerialization.h"
+#import "NSString+RKRequestSerialization.h"
 #import "RKNotifications.h"
 #import "RKClient.h"
 #import "../Support/Support.h"
