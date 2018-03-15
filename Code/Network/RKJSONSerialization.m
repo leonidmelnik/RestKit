@@ -13,7 +13,7 @@
 @implementation RKJSONSerialization
 
 + (id)JSONSerializationWithObject:(NSObject*)object {
-	return [[[self alloc] initWithObject:object] autorelease];
+	return [[(RKJSONSerialization *)[self alloc] initWithObject:object] autorelease];
 }
 
 - (id)initWithObject:(NSObject*)object {
